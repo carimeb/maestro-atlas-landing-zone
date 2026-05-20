@@ -3,7 +3,7 @@
 > **Self-service Atlas, orchestrated.**
 > Plataforma de automação de deployments e governança para MongoDB Atlas — protótipo de UX + starter kit de Infraestrutura como Código (IaC) pronto para começar a implantar.
 
-Este repositório acompanha o protótipo **Maestro** e entrega artefatos reais para iniciar uma *Atlas Landing Zone* (acesso self-service, frictionless e governado ao MongoDB Atlas), inspirada na arquitetura de referência do programa Enterprise Flywheel da MongoDB.
+Este repositório acompanha o protótipo **Maestro** e entrega artefatos reais para iniciar uma *Atlas Landing Zone* (acesso self-service, frictionless e governado ao MongoDB Atlas).
 
 > ⚠️ **Aviso:** "Maestro" é um nome de protótipo **não-oficial**. Não é um produto da MongoDB. Baseia-se publicamente nos conceitos de *Atlas Landing Zone / Developer Acceleration*.
 
