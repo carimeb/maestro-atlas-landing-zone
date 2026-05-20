@@ -1,0 +1,38 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfplan
+override.tf
+override.tf.json
+*_override.tf
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+
+# Var files com segredos reais devem ser ignorados.
+# Os *.tfvars deste repo são TEMPLATES (só placeholders) e ficam versionados.
+*.auto.tfvars
+*.secret.tfvars
+
+# Secrets / env
+.env
+.env.*
+*.pem
+*.key
+secrets.*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

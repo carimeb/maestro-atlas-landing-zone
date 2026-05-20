@@ -1,0 +1,15 @@
+{
+  "// nota": "Config de exemplo do MongoDB MCP Server para o Ops Copilot. Copie para o seu cliente MCP (Claude Desktop, Cowork, etc.) e preencha as credenciais. Use READ_ONLY=true por padrão.",
+  "mcpServers": {
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server"],
+      "env": {
+        "MDB_MCP_API_CLIENT_ID": "REPLACE_WITH_ATLAS_SERVICE_ACCOUNT_ID",
+        "MDB_MCP_API_CLIENT_SECRET": "REPLACE_WITH_ATLAS_SERVICE_ACCOUNT_SECRET",
+        "MDB_MCP_CONNECTION_STRING": "mongodb+srv://USER:PASS@cluster.mongodb.net",
+        "MDB_MCP_READ_ONLY": "true"
+      }
+    }
+  }
+}

@@ -1,0 +1,70 @@
+name: Atlas Landing Zone
+
+# Esteira de IaC da landing zone:
+#  - Pull Request  -> terraform plan (revisão)
+#  - Push na main  -> terraform apply (com aprovação no environment "production")
+#
+# Configure os secrets no repositório (Settings > Secrets and variables > Actions):
+#   MONGODB_ATLAS_PUBLIC_KEY
+#   MONGODB_ATLAS_PRIVATE_KEY
+#   AWS_ACCESS_KEY_ID        (apenas se usar rede privada)
+#   AWS_SECRET_ACCESS_KEY    (apenas se usar rede privada)
+
+on:
+  pull_request:
+    paths: ["terraform/**", "templates/**"]
+  push:
+    branches: [main]
+    paths: ["terraform/**", "templates/**"]
+  workflow_dispatch:
+    inputs:
+      var_file:
+        description: "Arquivo de variáveis"
+        default: "environments/dev.tfvars"
+
+env:
+  TF_VAR_FILE: ${{ github.event.inputs.var_file || 'environments/dev.tfvars' }}
+  MONGODB_ATLAS_PUBLIC_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_KEY }}
+  MONGODB_ATLAS_PRIVATE_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_KEY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  plan:
+    name: terraform plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+      - run: terraform fmt -check -recursive
+      - run: terraform init -input=false
+      - run: terraform validate
+      - run: terraform plan -input=false -var-file=${{ env.TF_VAR_FILE }} -out=tfplan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/tfplan
+
+  apply:
+    name: terraform apply
+    needs: plan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # Exige aprovação manual configurada no GitHub Environment "production"
+    # (Settings > Environments > production > Required reviewers).
+    environment: production
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+      - run: terraform init -input=false
+      - run: terraform apply -input=false -auto-approve -var-file=${{ env.TF_VAR_FILE }}
