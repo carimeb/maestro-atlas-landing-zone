@@ -1,5 +1,7 @@
 # Maestro — Atlas Landing Zone Starter Kit
 
+[Tela do Maestro]<img width="1254" height="822" alt="tela" src="https://github.com/user-attachments/assets/1a901833-3716-4a08-9ed9-a0546c8c5943" />
+
 > **Self-service Atlas, orchestrated.**
 > Plataforma de automação de deployments e governança para MongoDB Atlas — protótipo de UX + starter kit de Infraestrutura como Código (IaC) pronto para começar a implantar.
 
