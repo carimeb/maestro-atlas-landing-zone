@@ -99,6 +99,28 @@ python sizing_copilot.py --json sample-order.json --docs 10000000
 
 ---
 
+## Day 2 — Ops Copilot (operação com IA)
+
+Provisionar é só o começo (Day 0/1). O **Ops Copilot** opera o Atlas **em produção** com segurança, usando três peças:
+
+| Peça | Papel | Analogia |
+|------|-------|----------|
+| **MongoDB MCP Server** | Ferramentas para o agente ler e agir no Atlas (métricas, schema, `explain`, índices) | As "mãos" |
+| **Agent Skills** | Playbooks que ensinam procedimentos repetíveis | Os "manuais" |
+| **Claude** | Raciocínio, correlação e decisão | O "cérebro" |
+
+> Resolve a dúvida clássica de "como um agente complementa o Grafana": o Grafana detecta o **quê** (o alerta), o agente usa o MCP para investigar o **porquê** (métricas, `explain`, schema) e propor o **e agora** (ação com aprovação humana).
+
+**Ferramentas do MongoDB MCP Server** usadas pelo Ops Copilot: `atlas-list-clusters`, `atlas-create-cluster`, `atlas-get-metrics`, `atlas-performance-advisor`, `find`, `aggregate`, `explain`, `collection-schema`, `create-index`.
+
+**Agent Skills incluídas:** [`atlas-sizing`](./skills/atlas-sizing), [`schema-anti-pattern-review`](./skills/schema-anti-pattern-review), [`atlas-incident-triage`](./skills/atlas-incident-triage).
+
+**Segurança em camadas:** o agente é *read-only* por padrão; ações de risco (criar índice, escalar) exigem **aprovação humana**; ações destrutivas em produção nunca são autônomas. Toda ação é auditada no SIEM com credencial de menor privilégio.
+
+📖 Arquitetura completa + configuração do MCP Server: [`docs/agents-mcp-skills.md`](./docs/agents-mcp-skills.md).
+
+---
+
 ## Pré-requisitos
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.5
