@@ -1,12 +1,16 @@
 # Ops Copilot — MongoDB MCP Server + Agent Skills
 
-A operação Day-2 do Maestro usa um agente de IA para **operar o Atlas em produção** com segurança. A arquitetura tem três peças:
+A operação Day-2 do Maestro usa um agente de IA para **operar o Atlas em produção** com segurança. A arquitetura tem quatro peças:
 
 | Peça | Papel | Analogia |
 |------|-------|----------|
 | **MongoDB MCP Server** | Ferramentas para o agente ler e agir no Atlas | As "mãos" |
 | **Agent Skills** | Playbooks que ensinam procedimentos repetíveis | Os "manuais" |
-| **Claude** | Raciocínio, correlação e decisão | O "cérebro" |
+| **LLM** (Claude ou OpenAI) | Raciocínio, correlação e decisão | O "cérebro" |
+| **Memória em MongoDB** | Continuidade entre passos e entre sessões (curto + longo prazo, editável) | A "memória" |
+
+> O provider de LLM é plugável: Claude (Anthropic) ou OpenAI. A arquitetura não muda.
+> A camada de memória está documentada em [`agent-memory.md`](./agent-memory.md).
 
 > O MCP Server resolve a dúvida clássica de "como um agente complementa o Grafana": o Grafana detecta o **quê** (alerta), o agente usa o MCP para investigar o **porquê** (métricas, `explain`, schema) e propor o **e agora** (ação com aprovação).
 

@@ -36,3 +36,8 @@ venv/
 Thumbs.db
 .idea/
 .vscode/
+
+# Artefatos de trabalho (screenshots de validação, harness de teste)
+/*.png
+shot.py
+node_modules/

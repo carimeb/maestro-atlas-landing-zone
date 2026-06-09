@@ -18,25 +18,33 @@ Este repositório acompanha o protótipo **Maestro** e entrega artefatos reais p
 | [`demo/`](./demo) | Protótipo **Maestro** (HTML único) — abre no navegador, demonstra a experiência completa | 🟢 Demo navegável |
 | [`terraform/`](./terraform) | Módulos Terraform reais para provisionar a landing zone | 🟢 Atlas runnable · 🟡 Rede precisa de credenciais |
 | [`templates/`](./templates) | Templates do catálogo (`.tfvars`) espelhando os do Maestro | 🟢 Runnable |
-| [`sizing/`](./sizing) | Copilot de sizing/custo via **Anthropic API (Claude)** | 🟢 Runnable |
+| [`sizing/`](./sizing) | Copilot de sizing/custo via **LLM** (Claude ou OpenAI) | 🟢 Runnable |
 | [`.github/workflows/`](./.github/workflows) | Esteira CI/CD (GitHub Actions) — `plan` no PR, `apply` com aprovação | 🟢 Pronto |
 | [`skills/`](./skills) | **Agent Skills** (playbooks): atlas-sizing, schema-review, incident-triage | 🟢 Pronto |
 | [`mcp/`](./mcp) | Config de exemplo do **MongoDB MCP Server** (Ops Copilot Day-2) | 🟢 Pronto |
-| [`docs/`](./docs) | Arquitetura, Azure AD, Grafana e [Ops Copilot (MCP + Skills)](./docs/agents-mcp-skills.md) | 📄 Guia para o cliente |
+| [`docs/`](./docs) | Arquitetura, identidade, observabilidade, [Ops Copilot (MCP + Skills)](./docs/agents-mcp-skills.md), [memória do agente](./docs/agent-memory.md) e [changelog da demo](./docs/changelog-demo.md) | 📄 Guia para o cliente |
 
 ### O que é genuinamente "rodável hoje" vs. o que o cliente preenche
 
-Tudo que depende **apenas do MongoDB Atlas + Claude** já está pronto para executar (você tem essas credenciais):
+A demo usa uma **legenda de prontidão** para deixar isso explícito em cada conector:
+
+- 🟢 **Roda com MongoDB Atlas e suas APIs** — você já tem essas credenciais.
+- 🟡 **Requer instalação da ferramenta ou credencial de acesso no seu ambiente** — o conector está codado, mas precisa de acesso à ferramenta do cliente.
+
+Tudo que depende **apenas do MongoDB Atlas + uma chave de LLM** já está pronto para executar:
 
 - ✅ Provisionar projeto, cluster, usuários, IP access list e backup/PITR via Terraform.
-- ✅ Recomendação de tier e estimativa de custo via Claude.
+- ✅ Recomendação de tier e estimativa de custo via LLM (Claude **ou** OpenAI).
 - ✅ Pipeline de `plan`/`apply` no GitHub Actions.
 
-O que depende de acessos do **ambiente do cliente** vai como **módulo parametrizado + documentação** (formato padrão de entrega de uma landing zone):
+O que depende de acessos do **ambiente do cliente** vai como **módulo parametrizado + documentação** (formato padrão de entrega de uma landing zone). As camadas plugáveis cobrem:
 
-- 🟡 **VPC Peering / PrivateLink (AWS):** precisa das credenciais AWS e dos IDs de VPC do cliente → [`terraform/modules/network-aws`](./terraform/modules/network-aws).
-- 🟡 **Identidade federada (Azure AD):** configurada no tenant do cliente → [`docs/identity-azure-ad.md`](./docs/identity-azure-ad.md).
-- 🟡 **Observabilidade (Grafana):** datasource na instância do cliente → [`docs/observability-grafana.md`](./docs/observability-grafana.md).
+- 🟡 **Autenticação:** Microsoft Entra ID / AD, Okta, AWS IAM, Google Workspace.
+- 🟡 **Observabilidade:** Atlas metrics (nativo), Grafana, Prometheus, Datadog.
+- 🟡 **Base de conhecimento (RAG):** Atlas Vector Search + Confluence / SharePoint.
+- 🟡 **Cloud & rede:** AWS, GCP, Azure (Private Endpoint / PSC por padrão).
+
+> A filosofia é **core estável + conectores plugáveis**: adicionar um provider não muda o Maestro, muda apenas a configuração do ambiente. Ver [`docs/changelog-demo.md`](./docs/changelog-demo.md).
 
 ---
 
@@ -62,7 +70,7 @@ Os 6 pilares de design (Infra, Application, Security, IaC/Tooling, **Financial/F
 
 ### Day-2: Ops Copilot (agentes de IA)
 
-Além de provisionar (Day 0/1), o Maestro opera o Atlas em produção com um agente: o **MongoDB MCP Server** dá as ferramentas (métricas, schema, `explain`, índices), as **Agent Skills** são os playbooks, e o Claude raciocina — sempre com **ação em prod sob aprovação humana**. Veja [`docs/agents-mcp-skills.md`](./docs/agents-mcp-skills.md).
+Além de provisionar (Day 0/1), o Maestro opera o Atlas em produção com um agente, montado sobre quatro peças: o **MongoDB MCP Server** dá as ferramentas (as mãos), as **Agent Skills** são os playbooks (os manuais), o **LLM** (Claude ou OpenAI) raciocina (o cérebro) e a **memória em MongoDB** dá continuidade (a memória) — sempre com **ação em prod sob aprovação humana**. Veja [`docs/agents-mcp-skills.md`](./docs/agents-mcp-skills.md) e [`docs/agent-memory.md`](./docs/agent-memory.md).
 
 ---
 
@@ -109,13 +117,16 @@ Provisionar é só o começo (Day 0/1). O **Ops Copilot** opera o Atlas **em pro
 |------|-------|----------|
 | **MongoDB MCP Server** | Ferramentas para o agente ler e agir no Atlas (métricas, schema, `explain`, índices) | As "mãos" |
 | **Agent Skills** | Playbooks que ensinam procedimentos repetíveis | Os "manuais" |
-| **Claude** | Raciocínio, correlação e decisão | O "cérebro" |
+| **LLM** (Claude ou OpenAI) | Raciocínio, correlação e decisão | O "cérebro" |
+| **Memória em MongoDB** | Continuidade entre passos e sessões (curto + longo prazo, editável) | A "memória" |
 
 > Resolve a dúvida clássica de "como um agente complementa o Grafana": o Grafana detecta o **quê** (o alerta), o agente usa o MCP para investigar o **porquê** (métricas, `explain`, schema) e propor o **e agora** (ação com aprovação humana).
 
 **Ferramentas do MongoDB MCP Server** usadas pelo Ops Copilot: `atlas-list-clusters`, `atlas-create-cluster`, `atlas-get-metrics`, `atlas-performance-advisor`, `find`, `aggregate`, `explain`, `collection-schema`, `create-index`.
 
 **Agent Skills incluídas:** [`atlas-sizing`](./skills/atlas-sizing), [`schema-anti-pattern-review`](./skills/schema-anti-pattern-review), [`atlas-incident-triage`](./skills/atlas-incident-triage).
+
+**Memória do agente:** o Ops Copilot tem uma 4ª peça — memória de curto prazo (estado da sessão) e de longo prazo (fatos editáveis recuperáveis por *vector search*), com namespaces hierárquicos `org → projeto → cluster`. Na demo é mockada; a arquitetura de referência para implementá-la está em [`docs/agent-memory.md`](./docs/agent-memory.md).
 
 **Segurança em camadas:** o agente é *read-only* por padrão; ações de risco (criar índice, escalar) exigem **aprovação humana**; ações destrutivas em produção nunca são autônomas. Toda ação é auditada no SIEM com credencial de menor privilégio.
 
@@ -127,7 +138,7 @@ Provisionar é só o começo (Day 0/1). O **Ops Copilot** opera o Atlas **em pro
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.5
 - Conta MongoDB Atlas + [Programmatic API Key](https://www.mongodb.com/docs/atlas/configure-api-access/)
-- (Sizing) Python 3.10+ e uma `ANTHROPIC_API_KEY`
+- (Sizing) Python 3.10+ e uma chave de LLM: `ANTHROPIC_API_KEY` (Claude) ou `OPENAI_API_KEY` (OpenAI)
 - (Rede/AD/Grafana) credenciais do ambiente do cliente
 
 ## Segurança

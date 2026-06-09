@@ -34,9 +34,54 @@
   ::-webkit-scrollbar-thumb{background:#2a3656;border-radius:8px}
   ::-webkit-scrollbar-track{background:transparent}
 
+  /* ---------- WELCOME / ONBOARDING ---------- */
+  #welcome{
+    position:fixed;inset:0;z-index:60;overflow-y:auto;
+    background:radial-gradient(1100px 700px at 80% -10%, #182040 0%, transparent 60%),
+               radial-gradient(900px 600px at -10% 110%, #14224a 0%, transparent 55%),
+               var(--bg);
+  }
+  .wel-wrap{max-width:1080px;margin:0 auto;padding:48px 28px 64px}
+  .wel-head{text-align:center;margin-bottom:8px}
+  .wel-head .brand{margin-bottom:14px}
+  .wel-head h1{font-size:30px;margin:0;font-weight:750;letter-spacing:.3px}
+  .wel-head .tagline{font-size:14px;margin-top:8px}
+  .wel-lead{max-width:680px;margin:14px auto 0;color:var(--muted);font-size:14px;line-height:1.7;text-align:center}
+  .wel-badge{display:inline-block;margin:18px 0 8px;font-size:11px;color:var(--gold);
+    border:1px solid #6a571f;background:#251d0b;border-radius:20px;padding:5px 14px}
+  .wel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:30px}
+  @media(max-width:820px){.wel-grid{grid-template-columns:1fr}}
+  .wel-legend{display:flex;flex-direction:column;gap:9px;margin-top:26px;
+    background:#0e1426;border:1px solid var(--border);border-radius:11px;padding:15px 20px}
+  .wel-legend .lg-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px}
+  .wel-legend .lg-item{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted)}
+  .wel-legend .lg-item b{color:var(--text);font-weight:600}
+  .wel-legend .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .wel-card{background:linear-gradient(180deg,var(--panel),#11182c);border:1px solid var(--border);
+    border-radius:var(--radius);padding:20px}
+  .wel-card .wc-head{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  .wel-card .wc-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+  .wel-card h3{margin:0;font-size:15px;font-weight:650}
+  .wel-card .wc-sub{color:var(--muted);font-size:12px;margin:2px 0 14px}
+  .wc-opt{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:13px}
+  .wc-opt .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .wc-opt .soon{margin-left:auto;font-size:10px;color:var(--muted2);border:1px solid var(--border2);
+    border-radius:20px;padding:1px 8px}
+  .wc-hint{margin-top:14px;font-size:12px;color:var(--muted);background:#0e1426;border:1px solid var(--border);
+    border-radius:9px;padding:11px 13px;line-height:1.6}
+  .wc-hint code,.wc-hint .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent2);font-size:11.5px}
+  .wel-cta{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:34px;flex-wrap:wrap}
+  .wel-cta .go{background:linear-gradient(135deg,var(--accent),#5a57e0);color:#fff;border:none;border-radius:11px;
+    padding:14px 30px;font-weight:650;font-size:14px;cursor:pointer;transition:.15s}
+  .wel-cta .go:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(109,106,245,.4)}
+  .wel-cta .ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:11px;
+    padding:14px 22px;font-weight:550;font-size:13px;cursor:pointer}
+  .wel-cta .ghost:hover{color:var(--text);border-color:var(--accent)}
+  .wel-foot{text-align:center;color:var(--muted2);font-size:11.5px;margin-top:22px;line-height:1.7}
+
   /* ---------- LOGIN ---------- */
   #login{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
     background:radial-gradient(900px 600px at 50% 0%, #1a2045 0%, transparent 60%), var(--bg);
     z-index:50;
   }
@@ -275,6 +320,39 @@
 </head>
 <body>
 
+<!-- ========================= WELCOME / ONBOARDING ========================= -->
+<div id="welcome">
+  <div class="wel-wrap">
+    <div class="wel-head">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" style="width:44px;height:44px"><circle cx="24" cy="24" r="22" stroke="#6d6af5" stroke-width="2.5"/><path d="M14 30V18l10 8 10-8v12" stroke="#2dd4bf" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="3" fill="#6d6af5"/></svg>
+        <h1>Maestro</h1>
+      </div>
+      <div class="tagline">Self-service Atlas, orchestrated.</div>
+      <div class="wel-lead">
+        Uma <b>landing zone</b> é um ambiente de nuvem pré-configurado e <i>well-architected</i> — um conjunto de padrões, ferramentas e configurações que definem, de antemão, os requisitos de segurança, confiabilidade, performance e custo da organização. O <b>Maestro</b> aplica essa ideia ao MongoDB Atlas: dá aos times acesso self-service a clusters que já nascem dentro desses guardrails, sem que cada desenvolvedor precise reconfigurar segurança, rede ou billing do zero.
+      </div>
+      <div class="wel-badge">⬤ Protótipo não-oficial · baseado nos conceitos públicos de <a href="https://www.mongodb.com/docs/atlas/architecture/current/landing-zone/" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline">Atlas Landing Zone</a></div>
+    </div>
+
+    <div class="wel-legend">
+      <div class="lg-title">Legenda:</div>
+      <span class="lg-item"><span class="dot" style="background:#34d399"></span> <b>Roda com MongoDB Atlas e suas APIs</b></span>
+      <span class="lg-item"><span class="dot" style="background:#fbbf24"></span> <b>Requer instalação da ferramenta ou credencial de acesso no seu ambiente</b></span>
+    </div>
+
+    <div class="wel-grid" id="welGrid"></div>
+
+    <div class="wel-cta">
+      <button class="go" onclick="enterLogin()">Começar →</button>
+      <button class="ghost" onclick="skipToApp()">Já conheço — ir direto à demo</button>
+    </div>
+    <div class="wel-foot">
+      Repo &amp; instruções completas: <span class="mono" style="color:var(--accent2)">github.com/carimeb/maestro-atlas-landing-zone</span>
+    </div>
+  </div>
+</div>
+
 <!-- ========================= LOGIN ========================= -->
 <div id="login">
   <div class="login-card">
@@ -325,7 +403,6 @@
     <div class="nav-item" data-screen="copilot" onclick="nav('copilot')">
       <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="18" cy="17" r="2.4" stroke="currentColor" stroke-width="1.4"/></svg>
       Maestro Copilot
-      <span class="badge" style="background:linear-gradient(135deg,#6d6af5,#2dd4bf);color:#fff">AI</span>
     </div>
 
     <div class="nav-sec">Operação</div>
@@ -340,7 +417,11 @@
     <div class="nav-item" data-screen="agents" onclick="nav('agents')">
       <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20a7 7 0 0114 0" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v1.6M19 5l-1 1M22 12h-1.6M5 6L4 5M3.6 12H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Ops Copilot
-      <span class="badge" style="background:linear-gradient(135deg,#6d6af5,#2dd4bf);color:#fff">Day 2</span>
+    </div>
+    <div class="nav-item" data-screen="memory" onclick="nav('memory')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 4v16M4 9h5M4 15h5M15 8h2M15 12h2M15 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Memória do agente
+      <span class="badge" style="background:linear-gradient(135deg,#f0b860,#2dd4bf);color:#0a0e1a">novo</span>
     </div>
     <div class="nav-item" data-screen="finops" onclick="nav('finops')">
       <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v10M9.5 9.5C9.5 8 10.6 7.5 12 7.5s2.5.6 2.5 2-1.1 1.8-2.5 2-2.5.5-2.5 2 1.1 2 2.5 2 2.5-.6 2.5-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -391,7 +472,7 @@
    Arquitetura: camada de PROVIDERS desacoplada da UI.
    Hoje retorna dados MOCKADOS. Para ligar o real, troque o corpo das
    funções em Providers.* por chamadas fetch() ao Atlas Admin API e à
-   Anthropic API (Claude) — a UI não muda.
+   API de LLM escolhida — Anthropic (Claude) ou OpenAI. A UI não muda.
    ===================================================================== */
 
 /* ---------------- TIERS & PRICING (estimativas) ----------------
@@ -519,42 +600,143 @@ const Providers = {
     // REAL: GET https://cloud.mongodb.com/api/atlas/v2/groups/{id}/clusters (Digest auth)
     async createCluster(spec){ await wait(400); return {ok:true, spec}; }
   },
-  claude:{
+  // Provider de LLM — plugável: Claude (Anthropic) OU OpenAI. A UI não muda.
+  llm:{
     mode:'mock',
-    // REAL: POST https://api.anthropic.com/v1/messages
+    provider:'claude', // 'claude' | 'openai'
+    // REAL (Claude):  POST https://api.anthropic.com/v1/messages
     //   headers: x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access:true
-    //   system prompt = especialista em sizing Atlas + tabela TIERS/PRICING
+    // REAL (OpenAI):  POST https://api.openai.com/v1/chat/completions
+    //   headers: Authorization: Bearer OPENAI_API_KEY
+    //   system prompt = especialista em sizing Atlas + tabela TIERS/PRICING (igual nos dois)
     async sizing(message, history){
       await wait(650);
       return mockSizingReply(message);
     }
   }
 };
+// alias retrocompatível — chamadas a Providers.claude continuam funcionando
+Providers.claude = Providers.llm;
 const wait = ms => new Promise(r=>setTimeout(r,ms));
 
 /* =====================================================================
    APP NAV / SHELL
    ===================================================================== */
 function login(){
+  document.getElementById('welcome').style.display='none';
   document.getElementById('login').style.display='none';
   document.getElementById('app').style.display='grid';
   nav('dashboard');
 }
-function logout(){
-  document.getElementById('app').style.display='none';
+function enterLogin(){
+  document.getElementById('welcome').style.display='none';
   document.getElementById('login').style.display='flex';
 }
+function skipToApp(){ login(); }
+function logout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('welcome').style.display='block';
+  document.getElementById('login').style.display='none';
+}
+
+/* ---- Catálogo de camadas plugáveis (welcome screen) ----
+   ready: 'now'    = roda hoje só com MongoDB Atlas + Claude (verde)
+   ready: 'client' = conector codado, requer credencial/ambiente do cliente (âmbar) */
+function renderWelcomeGrid(){
+  const WELCOME_LAYERS = [
+  {
+    title:'Autenticação & Identidade', color:'#6d6af5',
+    icon:'<path d="M12 2l7 3v6c0 4.4-3 8.4-7 10-4-1.6-7-5.6-7-10V5l7-3z" stroke="#6d6af5" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.2" stroke="#6d6af5" stroke-width="1.5"/>',
+    opts:[
+      {name:'Microsoft Entra ID / AD', ready:'client'},
+      {name:'Okta', ready:'client'},
+      {name:'AWS IAM', ready:'client'},
+      {name:'Google Workspace', ready:'client'},
+    ],
+    hint:'Grupos do IdP viram roles do Atlas (RBAC). Defina o provider em <code>terraform/modules/identity</code> e mapeie grupos → roles no <code>*.tfvars</code>.'
+  },
+  {
+    title:'Observabilidade', color:'#2dd4bf',
+    icon:'<path d="M3 16l5-6 4 4 5-7 4 5" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    opts:[
+      {name:'Atlas metrics (endpoint Prometheus nativo)', ready:'now'},
+      {name:'Grafana', ready:'client'},
+      {name:'Prometheus (self-hosted)', ready:'client'},
+      {name:'Datadog', ready:'client'},
+    ],
+    hint:'O Atlas expõe métricas nativamente; Grafana/Datadog/Prometheus consomem como datasource na instância do cliente. Configure em <code>docs/observability-*.md</code>.'
+  },
+  {
+    title:'Base de conhecimento (RAG)', color:'#f0b860',
+    icon:'<path d="M4 5a2 2 0 012-2h6v18H6a2 2 0 01-2-2V5z" stroke="#f0b860" stroke-width="1.6"/><path d="M20 5a2 2 0 00-2-2h-6v18h6a2 2 0 002-2V5z" stroke="#f0b860" stroke-width="1.6"/>',
+    opts:[
+      {name:'Atlas Vector Search (índice + embeddings)', ready:'now'},
+      {name:'Confluence', ready:'client'},
+      {name:'SharePoint', ready:'client'},
+    ],
+    hint:'Outros serviços de vector search e embeddings precisam ser codados.'
+  },
+  {
+    title:'Cloud & Pareamento de rede', color:'#56a8ff',
+    icon:'<path d="M6 16a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 16H6z" stroke="#56a8ff" stroke-width="1.6" stroke-linejoin="round"/>',
+    opts:[
+      {name:'AWS — VPC Peering / PrivateLink', ready:'client'},
+      {name:'GCP — VPC Peering / PSC', ready:'client'},
+      {name:'Azure — VNet Peering / Private Endpoint', ready:'client'},
+    ],
+    hint:'Peering por provider. Preencha IDs da VPC/VNet e credenciais do cliente em <code>terraform/modules/network-*</code>.'
+  },
+  {
+    title:'FinOps', color:'#34d399',
+    icon:'<circle cx="12" cy="12" r="9" stroke="#34d399" stroke-width="1.6"/><path d="M12 7v10M9.5 9.5C9.5 8 10.6 7.5 12 7.5s2.5.6 2.5 2-1.1 1.8-2.5 2-2.5.5-2.5 2 1.1 2 2.5 2 2.5-.6 2.5-2" stroke="#34d399" stroke-width="1.4" stroke-linecap="round"/>',
+    opts:[
+      {name:'Atlas Billing APIs', ready:'now'},
+      {name:'Chargeback por tag (cost-center)', ready:'now'},
+      {name:'Right-sizing automático', ready:'now'},
+    ],
+    hint:'Custos vêm das <code>Atlas Billing APIs</code> e são rateados pelas tags obrigatórias. Sem dependência externa para começar.'
+  },
+  {
+    title:'Camada de agentes (IA)', color:'#a78bfa',
+    icon:'<circle cx="12" cy="8" r="3.2" stroke="#a78bfa" stroke-width="1.6"/><path d="M5 20a7 7 0 0114 0" stroke="#a78bfa" stroke-width="1.6"/>',
+    opts:[
+      {name:'MongoDB MCP Server (ferramentas)', ready:'now'},
+      {name:'Agent Skills (playbooks)', ready:'now'},
+      {name:'Memória curto/longo prazo (Atlas)', ready:'now'},
+    ],
+    hint:'MCP + Skills + memória editável em MongoDB. Só precisa da connection string do Atlas e de uma chave de LLM — <code>ANTHROPIC_API_KEY</code> (Claude) ou <code>OPENAI_API_KEY</code> (OpenAI).'
+  },
+  ];
+  const COLORS={now:'#34d399', client:'#fbbf24'};
+  const grid=document.getElementById('welGrid');
+  if(!grid) return;
+  grid.innerHTML = WELCOME_LAYERS.map(l=>{
+    const nowN=l.opts.filter(o=>o.ready==='now').length;
+    const opts=l.opts.map(o=>`<div class="wc-opt"><span class="dot" style="background:${COLORS[o.ready]}"></span><span>${o.name}</span>${o.ready==='client'?'<span class="soon">requer credencial</span>':''}</div>`).join('');
+    return `<div class="wel-card">
+      <div class="wc-head">
+        <div class="wc-ic" style="background:${l.color}1f"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">${l.icon}</svg></div>
+        <div><h3>${l.title}</h3></div>
+      </div>
+      <div class="wc-sub">${nowN>0?`${nowN} roda${nowN>1?'m':''} já · `:''}${l.opts.length} conector${l.opts.length>1?'es':''} codado${l.opts.length>1?'s':''}</div>
+      ${opts}
+      <div class="wc-hint">${l.hint}</div>
+    </div>`;
+  }).join('');
+}
+window.addEventListener('DOMContentLoaded', renderWelcomeGrid);
 const PAGES = {
   dashboard:{t:'Dashboard', s:'Visão geral da sua landing zone Atlas', r:renderDashboard},
   catalog:{t:'Catálogo de templates', s:'Ambientes Atlas pré-aprovados e well-architected', r:renderCatalog},
   request:{t:'Solicitar cluster', s:'Acesso self-service governado ao MongoDB Atlas', r:renderRequest},
   copilot:{t:'Maestro Copilot', s:'Assistente de sizing e estimativa de custo', r:renderCopilot},
   pipeline:{t:'Provisionamento', s:'Pipeline IaC — Terraform + Azure DevOps', r:renderPipeline},
-  observability:{t:'Observabilidade', s:'Métricas de saúde dos clusters (Grafana)', r:renderObservability},
+  observability:{t:'Observabilidade', s:'Saúde dos clusters (Grafana · Prometheus · Datadog)', r:renderObservability},
   agents:{t:'Ops Copilot · Agentes de IA', s:'Operação Day-2 com MongoDB MCP Server + Agent Skills', r:renderAgents},
+  memory:{t:'Memória do agente', s:'Memória de curto e longo prazo em MongoDB — editável e auditável', r:renderMemory, after:afterMemory},
   finops:{t:'FinOps', s:'Visibilidade financeira e chargeback por time', r:renderFinops},
   guardrails:{t:'Guardrails & Segurança', s:'Políticas codificadas nos templates', r:renderGuardrails},
-  kb:{t:'Base de conhecimento', s:'Decision trees, sizing e FAQ (Confluence)', r:renderKB},
+  kb:{t:'Base de conhecimento', s:'Decision trees, sizing e FAQ (Confluence · SharePoint)', r:renderKB},
 };
 let charts=[];
 function destroyCharts(){ charts.forEach(c=>{try{c.destroy()}catch(e){}}); charts=[]; if(window._obTimer)clearInterval(window._obTimer); }
@@ -800,7 +982,7 @@ function renderCopilot(){
           <li><b>Conexões</b> e <b>throughput</b> limitam o tier mínimo.</li>
           <li>Custo = compute + storage + backup + <b>10% rede</b>.</li>
         </ul>
-        <div class="banner small mt2" style="margin-top:16px">No protótipo as respostas são geradas localmente. Para respostas do Claude ao vivo, basta plugar a Anthropic API em <span class="mono">Providers.claude</span>.</div>
+        <div class="banner small mt2" style="margin-top:16px">No protótipo as respostas são geradas localmente. Para respostas ao vivo, basta plugar a API de LLM (Claude ou OpenAI) em <span class="mono">Providers.llm</span>.</div>
       </div>
     </div>
   </div>
@@ -919,7 +1101,7 @@ function runJsonAnalysis(){
     <div class="sectiontitle" style="margin:18px 0 12px">Anti-patterns de modelagem (análise IA)</div>
     ${issuesHtml}
     <div class="flex mt2"><button class="btn sm" onclick="STATE.tier='${rec.tier.name}';nav('request');toast('Tier ${rec.tier.name} aplicado no formulário')">Usar ${rec.tier.name} no formulário →</button></div>
-    <div class="small muted mt" style="margin-top:10px">Estimativa baseada no tamanho JSON (BSON real pode variar). Análise de anti-patterns no protótipo é heurística local; em produção, o Claude faz a leitura semântica.</div>`;
+    <div class="small muted mt" style="margin-top:10px">Estimativa baseada no tamanho JSON (BSON real pode variar). Análise de anti-patterns no protótipo é heurística local; em produção, o LLM (Claude ou OpenAI) faz a leitura semântica.</div>`;
 }
 function drawChat(){
   const log=document.getElementById('chatLog'); if(!log)return;
@@ -1035,6 +1217,10 @@ function renderObservability(){
     <div class="spacer" style="flex:1"></div>
     <span class="env-tag">⟳ ao vivo · janela 15min</span>
   </div>
+  <div class="flex small" style="margin-bottom:14px;gap:8px;flex-wrap:wrap">
+    <span class="muted">Backend de métricas:</span>
+    ${OBS_SOURCES.map(s=>`<span class="tag ${s.on?'t-ok':''}" style="${s.on?'':'opacity:.55'};cursor:pointer" onclick="toast('${s.name}: ${s.on?'conectado':'conecte no painel de integrações'}')"><span class="dot" style="background:${s.on?'#34d399':'#5b6480'}"></span> ${s.name}</span>`).join(' ')}
+  </div>
   <div class="grid cols-4 mt">
     ${obStat('CPU System','62%','#fbbf24')}
     ${obStat('Memória residente','24.1 GB','#6d6af5')}
@@ -1090,12 +1276,63 @@ const SKILLS=[
   {n:'atlas-incident-triage', d:'Correlaciona métricas + slow query e propõe causa raiz'},
   {n:'index-advisor', d:'Sugere índices via Performance Advisor'},
   {n:'finops-rightsizing', d:'Detecta over-provisioning e sugere ajuste'},
+  {n:'memory-curator', d:'Escreve/edita/expira fatos na memória de longo prazo (Atlas)'},
 ];
+
+/* ---- Conectores plugáveis (adaptam o Maestro ao ambiente do cliente) ---- */
+const AUTH_SOURCES=[
+  {name:'Microsoft Entra ID / AD', on:true},
+  {name:'Okta', on:true},
+  {name:'AWS IAM', on:true},
+  {name:'Google Workspace', on:true},
+];
+const OBS_SOURCES=[
+  {name:'Grafana', on:true},
+  {name:'Prometheus', on:true},
+  {name:'Datadog', on:false},
+];
+const KB_SOURCES=[
+  {name:'Confluence', on:true},
+  {name:'SharePoint', on:true},
+];
+const CLOUD_SOURCES=[
+  {name:'AWS', on:true, detail:'VPC Peering · PrivateLink'},
+  {name:'GCP', on:true, detail:'VPC Peering · Private Service Connect'},
+  {name:'Azure', on:false, detail:'VNet Peering · Private Endpoint'},
+];
+
+/* =====================================================================
+   MEMÓRIA DO AGENTE  (curto + longo prazo · namespaces hierárquicos)
+   Inspirado nos componentes de um agente (percepção, ferramentas, memória)
+   e na interface do Claude (memória, instruções, arquivos): EDITÁVEL.
+   ===================================================================== */
+const MEM_NAMESPACE = {org:'contoso-atlas-prod', project:'payments', cluster:'fraud-ml-prod'};
+
+// Memória de LONGO prazo — fatos persistentes, recuperáveis por vector search, editáveis.
+let LTM = [
+  {id:'m1', scope:'cluster', text:'Índice { user_id: 1 } criado em 03/06 resolveu COLLSCAN na coleção transactions (p95 −65%).', kind:'decisão', src:'atlas-incident-triage', ts:'03/06 14:22', pinned:true},
+  {id:'m2', scope:'cluster', text:'Baseline de CPU em horário comercial: 55–65%. Picos acima de 85% por +5min são anômalos.', kind:'baseline', src:'observação contínua', ts:'28/05 09:10', pinned:false},
+  {id:'m3', scope:'project', text:'Janela de manutenção aprovada pelo time de Payments: domingos 02:00–04:00 (BRT).', kind:'política', src:'dev (manual)', ts:'20/05 16:40', pinned:true},
+  {id:'m4', scope:'cluster', text:'A coleção message_history cresce sem limite (~1.240 itens/doc) — refatoração de schema pendente (ticket JIRA PAY-812).', kind:'pendência', src:'schema-anti-pattern-review', ts:'01/06 11:05', pinned:false},
+  {id:'m5', scope:'org', text:'Política de FinOps: clusters com CPU média <15% por 30 dias são candidatos a downgrade automático (com aprovação).', kind:'política', src:'dev (manual)', ts:'10/05 08:00', pinned:false},
+  {id:'m6', scope:'cluster', text:'Restore de PITR testado com sucesso em 15/05 — RTO medido: 18 min.', kind:'fato', src:'atlas-ops', ts:'15/05 19:30', pinned:false},
+];
+// Memória de CURTO prazo — estado da sessão de triage atual (efêmero, checkpointer LangGraph).
+const STM = [
+  {step:'Research', note:'Alerta CPU>85% em fraud-ml-prod. Coletando métricas + performance advisor.'},
+  {step:'Plan', note:'1) explain na query quente · 2) checar índice em user_id · 3) propor create-index sob aprovação.'},
+  {step:'Implement', note:'COLLSCAN confirmado. Recuperado da LTM: índice análogo já resolveu caso similar (m1). Recomendar índice.'},
+];
+const SCOPE_META = {
+  org:{label:'Organização', color:'#f0b860', icon:'◈'},
+  project:{label:'Projeto', color:'#56a8ff', icon:'▣'},
+  cluster:{label:'Cluster', color:'#2dd4bf', icon:'⬡'},
+};
 function renderAgents(){
   return `
   <div class="banner" style="margin-bottom:8px">
     <div class="ic-box" style="background:var(--accent-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="#6d6af5" stroke-width="1.6"/><path d="M5 20a7 7 0 0114 0" stroke="#6d6af5" stroke-width="1.6"/></svg></div>
-    <div>O <b>Ops Copilot</b> opera o Atlas em produção: o <b>MongoDB MCP Server</b> dá as ferramentas (ler métricas, schema, rodar <span class="mono">explain</span>, criar índices), as <b>Agent Skills</b> são os playbooks, e o Claude raciocina. <b>Ações em produção exigem aprovação humana.</b></div>
+    <div>O <b>Ops Copilot</b> opera o Atlas em produção: o <b>MongoDB MCP Server</b> dá as ferramentas (as mãos), as <b>Agent Skills</b> são os playbooks (os manuais), o <b>LLM</b> (Claude ou OpenAI) raciocina (o cérebro) e a <b>Memória em MongoDB</b> dá continuidade (curto + longo prazo, editável). <b>Ações em produção exigem aprovação humana.</b></div>
   </div>
 
   <div class="chat-wrap">
@@ -1141,6 +1378,13 @@ function renderAgents(){
         </div>
         <div class="small muted mt" style="margin-top:8px">Toda ação é registrada no SIEM com a credencial de menor privilégio do agente.</div>
       </div>
+      <div class="card mt" style="margin-top:16px;cursor:pointer" onclick="nav('memory')">
+        <div class="spread"><h3>Memória</h3><span class="tag" style="background:linear-gradient(135deg,#f0b860,#2dd4bf);color:#0a0e1a">editável</span></div>
+        <div class="small muted" style="margin:6px 0 10px">Curto prazo (sessão) + longo prazo (Atlas)</div>
+        <div class="flex small" style="padding:3px 0"><span class="dot" style="background:#2dd4bf"></span> <span>${LTM.length} fatos de longo prazo · <span class="mono">vector search</span></span></div>
+        <div class="flex small" style="padding:3px 0"><span class="dot" style="background:#6d6af5"></span> <span>${STM.length} passos na sessão atual · <span class="mono">checkpointer</span></span></div>
+        <div class="small" style="margin-top:8px;color:var(--accent2)">Abrir memória do agente →</div>
+      </div>
     </div>
   </div>`;
 }
@@ -1164,6 +1408,122 @@ function agentAct(el,action){
     foot.innerHTML='<span class="tag" style="background:#1b2335;color:#8b97b3">dispensado</span>';
   }
 }
+
+/* =====================================================================
+   6b) MEMÓRIA DO AGENTE
+   ===================================================================== */
+let MEM_FILTER='all';
+function renderMemory(){
+  return `
+  <div class="banner" style="margin-bottom:14px">
+    <div class="ic-box" style="background:var(--accent-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="#6d6af5" stroke-width="1.6"/><path d="M9 4v16M4 9h5M4 15h5" stroke="#6d6af5" stroke-width="1.5"/></svg></div>
+    <div>A memória dá <b>continuidade</b> ao agente. Espelha os componentes de um agente (<b>percepção · ferramentas · memória</b>) e a interface do Claude (<b>memória · instruções · arquivos</b>): tudo aqui é <b>observável, editável e auditável</b> — o dev vê o que o agente "sabe", corrige o que estiver errado e expira o que não vale mais.</div>
+  </div>
+
+  <div class="grid cols-3" style="margin-bottom:18px">
+    <div class="card kpi"><div class="label">Memória de longo prazo</div><div class="val" id="ltmCount">${LTM.length}</div><div class="delta muted">fatos · Atlas + Vector Search</div></div>
+    <div class="card kpi"><div class="label">Memória de curto prazo</div><div class="val">${STM.length}</div><div class="delta muted">passos · checkpointer da sessão</div></div>
+    <div class="card kpi"><div class="label">Namespace ativo</div><div class="val" style="font-size:15px;line-height:1.5;margin-top:10px"><span class="mono">${MEM_NAMESPACE.org}</span><br><span class="mono muted">/${MEM_NAMESPACE.project}/${MEM_NAMESPACE.cluster}</span></div></div>
+  </div>
+
+  <div class="chat-wrap">
+    <div>
+      <div class="spread" style="align-items:center">
+        <div class="sectiontitle" style="margin:0">Memória de longo prazo <span class="muted small" style="font-weight:400">— editável</span></div>
+        <button class="btn sm" onclick="memAdd()">+ Adicionar fato</button>
+      </div>
+      <div class="flex small" style="gap:6px;margin:10px 0 14px;flex-wrap:wrap">
+        ${['all','org','project','cluster'].map(s=>`<span class="tag ${MEM_FILTER===s?'t-run':''}" style="cursor:pointer" onclick="memFilter('${s}')">${s==='all'?'todos os escopos':SCOPE_META[s].icon+' '+SCOPE_META[s].label}</span>`).join('')}
+      </div>
+      <div id="ltmList">${renderLTM()}</div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>Memória de curto prazo (sessão)</h3>
+        <div class="small muted" style="margin:6px 0 12px">Estado da investigação em andamento. Efêmero — vive no <span class="mono">checkpointer</span> (LangGraph + MongoDB) e expira ao fim da sessão.</div>
+        ${STM.map(s=>`<div style="padding:8px 0;border-bottom:1px solid #1b2335"><div class="small"><b style="color:var(--accent2)">${s.step}</b></div><div class="small muted" style="margin-top:3px">${s.note}</div></div>`).join('')}
+        <div class="small muted" style="margin-top:10px">Princípio de Context Engineering: <i>ao fim de cada passo, anexe o plano</i> — não reescreva o histórico.</div>
+      </div>
+
+      <div class="card mt" style="margin-top:16px">
+        <h3>Como funciona</h3>
+        <div style="margin-top:10px">
+          ${memHow('⬡','Escrita','Skills (ex. <span class="mono">memory-curator</span>) e o resultado de cada triagem gravam fatos relevantes — nunca segredos.')}
+          ${memHow('⌕','Recuperação','Antes de raciocinar, o agente busca a memória por <span class="mono">vector search</span> no namespace ativo (e herda do escopo pai).')}
+          ${memHow('✎','Edição humana','O dev edita/apaga/fixa fatos — igual à memória editável do Claude. Correções não são sobrescritas pelo agente.')}
+          ${memHow('◉','Auditoria','Toda escrita/edição vai pro SIEM com autor e timestamp.')}
+        </div>
+      </div>
+
+      <div class="card mt" style="margin-top:16px">
+        <h3>Namespaces hierárquicos</h3>
+        <div class="small muted" style="margin:6px 0 10px">Herança: <span class="mono">org → projeto → cluster</span>. Um fato no escopo da org vale para todos os clusters abaixo; o cluster pode ter fatos específicos.</div>
+        <div class="small" style="line-height:2">
+          <div><span class="tag" style="background:#251d0b;color:#f0b860">◈ org</span> contoso-atlas-prod</div>
+          <div style="padding-left:18px"><span class="tag" style="background:#0c1830;color:#56a8ff">▣ projeto</span> payments</div>
+          <div style="padding-left:36px"><span class="tag" style="background:#0c2220;color:#2dd4bf">⬡ cluster</span> fraud-ml-prod</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function memHow(ic,t,d){
+  return `<div class="flex" style="align-items:flex-start;gap:10px;padding:7px 0"><span style="color:var(--accent);font-size:16px;line-height:1.4">${ic}</span><div><div class="small"><b>${t}</b></div><div class="small muted">${d}</div></div></div>`;
+}
+function renderLTM(){
+  const items = LTM.filter(m=>MEM_FILTER==='all'||m.scope===MEM_FILTER);
+  if(!items.length) return `<div class="card"><div class="small muted">Nenhum fato neste escopo.</div></div>`;
+  return items.map(m=>{
+    const sc=SCOPE_META[m.scope];
+    return `<div class="card agent-card" id="mem_${m.id}" style="margin-bottom:12px;border-left:3px solid ${sc.color}">
+      <div class="spread" style="align-items:center">
+        <div class="flex" style="gap:8px;flex-wrap:wrap">
+          <span class="tag" style="background:${sc.color}22;color:${sc.color}">${sc.icon} ${sc.label}</span>
+          <span class="tag" style="background:#1b2335;color:#8b97b3">${m.kind}</span>
+          ${m.pinned?'<span class="tag" style="background:#251d0b;color:#f0b860">★ fixado</span>':''}
+        </div>
+        <span class="muted small">${m.ts}</span>
+      </div>
+      <div class="small" style="margin-top:10px;color:#c3cce0" id="memtxt_${m.id}">${m.text}</div>
+      <div class="small muted" style="margin-top:6px">origem: ${m.src}</div>
+      <div class="agent-actions flex mt2" style="gap:8px">
+        <button class="btn ghost sm" onclick="memEdit('${m.id}')">Editar</button>
+        <button class="btn ghost sm" onclick="memPin('${m.id}')">${m.pinned?'Desafixar':'Fixar'}</button>
+        <button class="btn ghost sm" style="color:#f87171" onclick="memForget('${m.id}')">Esquecer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function refreshLTM(){ const el=document.getElementById('ltmList'); if(el)el.innerHTML=renderLTM(); const c=document.getElementById('ltmCount'); if(c)c.textContent=LTM.length; }
+function memFilter(s){ MEM_FILTER=s; nav('memory'); }
+function memEdit(id){
+  const m=LTM.find(x=>x.id===id); if(!m)return;
+  const box=document.getElementById('memtxt_'+id);
+  box.innerHTML=`<textarea class="fi" style="width:100%;min-height:64px;resize:vertical" id="ed_${id}">${m.text}</textarea>
+    <div class="flex mt2" style="gap:8px"><button class="btn sm" onclick="memSave('${id}')">Salvar</button><button class="btn ghost sm" onclick="refreshLTM()">Cancelar</button></div>`;
+}
+function memSave(id){
+  const m=LTM.find(x=>x.id===id); const v=document.getElementById('ed_'+id).value.trim();
+  if(v){ m.text=v; m.src='dev (editado)'; m.ts='agora'; toast('Fato atualizado — auditado no SIEM'); }
+  refreshLTM();
+}
+function memPin(id){ const m=LTM.find(x=>x.id===id); m.pinned=!m.pinned; toast(m.pinned?'Fato fixado':'Fato desafixado'); refreshLTM(); }
+function memForget(id){
+  const el=document.getElementById('mem_'+id);
+  if(el){ el.style.opacity='.4'; }
+  LTM=LTM.filter(x=>x.id!==id);
+  toast('Fato esquecido — removido da memória de longo prazo');
+  setTimeout(refreshLTM,250);
+}
+function memAdd(){
+  const id='m'+Date.now();
+  LTM.unshift({id, scope:(MEM_FILTER==='all'?'cluster':MEM_FILTER), text:'(novo fato — clique em Editar para descrever)', kind:'fato', src:'dev (manual)', ts:'agora', pinned:false});
+  toast('Fato adicionado à memória de longo prazo');
+  refreshLTM();
+  setTimeout(()=>memEdit(id),100);
+}
+function afterMemory(){ /* placeholder p/ simetria com outras telas que usam after() */ }
 
 /* =====================================================================
    7) FINOPS
@@ -1205,16 +1565,28 @@ PAGES.finops.after=()=>{
 /* =====================================================================
    8) GUARDRAILS & SEGURANÇA
    ===================================================================== */
+function connectorCard(title,names){
+  return `<div class="card"><div class="small muted" style="font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-size:10.5px">${title}</div>
+    <div style="margin-top:10px">${names.map(n=>{const off=n.includes('(off)');const label=n.replace(' (off)','');return `<div class="flex small" style="padding:4px 0"><span class="dot" style="background:${off?'#5b6480':'#34d399'}"></span> <span style="${off?'opacity:.6':''}">${label}</span></div>`;}).join('')}</div></div>`;
+}
 function renderGuardrails(){
   const planes=[
-    {t:'Security & Identity Plane',c:'#6d6af5',items:['SSO federado (Azure AD) + MFA','Grupos AD → roles do Atlas (RBAC)','Encryption at-rest com BYOK (KMS)','Database auth via SCRAM / X.509','Secrets em Vault / Key Vault']},
-    {t:'Networking',c:'#2dd4bf',items:['Private Endpoint / VPC Peering','IP Access List por ambiente','Sem exposição pública em prod','TLS 1.2+ obrigatório']},
+    {t:'Security & Identity Plane',c:'#6d6af5',items:['SSO federado: Microsoft Entra ID / AD · Okta · AWS IAM · Google Workspace','Grupos do IdP → roles do Atlas (RBAC)','Encryption at-rest com BYOK (KMS)','Database auth via SCRAM / X.509','Secrets em Vault / Key Vault']},
+    {t:'Networking',c:'#2dd4bf',items:['Peering multicloud: AWS · GCP · Azure','Private Endpoint / PrivateLink / PSC','IP Access List por ambiente','Sem exposição pública em prod','TLS 1.2+ obrigatório']},
     {t:'Compliance & Audit',c:'#f0b860',items:['Audit log → SIEM (Splunk/Elastic)','Data residency por região','Retenção de logs 365d','Tags obrigatórias (centro de custo, owner)']},
     {t:'Data Protection',c:'#34d399',items:['Backup contínuo (PITR) em prod','DR multi-region para FinServ','Online Archive p/ data tiering','Política de retenção por classificação']},
   ];
   const cards=planes.map(p=>`<div class="card"><h3 style="color:${p.c}">${p.t}</h3><ul class="small" style="padding-left:16px;line-height:2;color:#c3cce0;margin:10px 0 0">${p.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`).join('');
   return `
   <div class="banner" style="margin-bottom:8px"><div>Toda solicitação herda estas políticas <b>automaticamente</b> a partir do template — o dev não consegue criar nada fora do padrão. É o "guardrail" da landing zone.</div></div>
+  <div class="sectiontitle">Conectores plugáveis — adaptam o Maestro ao ambiente do cliente</div>
+  <div class="grid cols-4">
+    ${connectorCard('Autenticação', AUTH_SOURCES.map(a=>a.name+(a.on?'':' (off)')))}
+    ${connectorCard('Observabilidade', OBS_SOURCES.map(o=>o.name+(o.on?'':' (off)')))}
+    ${connectorCard('Base de conhecimento', KB_SOURCES.map(k=>k.name))}
+    ${connectorCard('Cloud / Peering', CLOUD_SOURCES.map(c=>c.name+(c.on?'':' (off)')))}
+  </div>
+  <div class="small muted" style="margin:10px 2px 0">Cada camada é uma interface plugável: o core do Maestro não muda — só se conecta ao que o cliente já roda em produção. FinOps usa as <span class="mono">Atlas Billing APIs</span> (ver tela FinOps).</div>
   <div class="sectiontitle">Mapa de classificação → template</div>
   <div class="card" style="padding:6px 6px 0">
     <table><thead><tr><th>Classificação do dado</th><th>Templates permitidos</th><th>BYOK</th><th>Backup</th><th>Rede</th></tr></thead><tbody>
@@ -1240,7 +1612,10 @@ const KB=[
 ];
 function renderKB(){
   const cards=KB.map((k,i)=>`<div class="kb-card" onclick="openKB(${i})"><div class="breadcrumb">${k.bc}</div><div class="kt">${k.t}</div><div class="kd">${k.d}</div></div>`).join('');
-  return `<div class="banner" style="margin-bottom:8px"><div>Base de conhecimento centralizada (estilo <b>Confluence</b>) — decision trees, sizing, FinOps e FAQ para os times de aplicação.</div></div><div class="kb-grid mt2">${cards}</div>`;
+  const sources=KB_SOURCES.map(s=>`<span class="tag ${s.on?'t-ok':''}" style="${s.on?'':'opacity:.6'}"><span class="dot" style="background:${s.on?'#34d399':'#5b6480'}"></span> ${s.name}</span>`).join(' ');
+  return `<div class="banner" style="margin-bottom:8px"><div>Base de conhecimento federada — conectores plugáveis indexados por <b>Atlas Vector Search</b> e servidos ao agente como memória de longo prazo. Fontes ativas: ${sources}</div></div>
+  <div class="small muted" style="margin:4px 2px 14px">Conecte a fonte que o cliente já usa. O Maestro normaliza o conteúdo, gera embeddings (Voyage AI) e indexa no Atlas — o agente recupera via RAG.</div>
+  <div class="kb-grid mt2">${cards}</div>`;
 }
 function openKB(i){const k=KB[i];openModal(`<div class="modal-h"><div class="ic-box" style="background:var(--accent-soft)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h9l5 5v11H5z" stroke="#6d6af5" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div><div class="breadcrumb">${k.bc}</div><b>${k.t}</b></div><span class="x" onclick="closeModal()">×</span></div><div class="modal-b">${k.body}</div>`);}
 </script>

@@ -10,6 +10,7 @@ A landing zone organiza o acesso ao MongoDB Atlas em planos de controle, espelha
 | **Integration & Delivery** | Orquestração e CI/CD | `.github/workflows/` + `terraform/` |
 | **Security & Identity** | SSO, RBAC, BYOK, secrets | `docs/identity-azure-ad.md` + guardrails nos módulos |
 | **Observability** | Métricas, logs, alertas | `docs/observability-grafana.md` |
+| **Agent Plane (Day-2)** | Ops Copilot: MCP + Skills + LLM + memória | `docs/agents-mcp-skills.md`, `docs/agent-memory.md` |
 | **Resource Plane** | Cluster Atlas + rede | `terraform/modules/*` |
 
 ## Fluxo de provisionamento (Day 1)
