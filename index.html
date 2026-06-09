@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maestro — Self-service Atlas, orchestrated</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0e1a; --bg2:#0e1426; --panel:#141b30; --panel2:#1b2442;
+    --border:#26314e; --border2:#324063;
+    --text:#e8edf7; --muted:#8b97b3; --faint:#5b6480;
+    --muted2:#67738f;
+    --accent:#6d6af5; --accent-soft:#6d6af522; --accent2:#2dd4bf;
+    --gold:#f0b860; --green:#34d399; --red:#f87171; --amber:#fbbf24; --blue:#56a8ff;
+    --shadow:0 10px 40px rgba(0,0,0,.45);
+    --radius:14px;
+    font-synthesis:none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 700px at 80% -10%, #182040 0%, transparent 60%),
+               radial-gradient(900px 600px at -10% 110%, #14224a 0%, transparent 55%),
+               var(--bg);
+    color:var(--text);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    font-size:14px;
+    overflow:hidden;
+  }
+  a{color:var(--accent2);text-decoration:none}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#2a3656;border-radius:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* ---------- WELCOME / ONBOARDING ---------- */
+  #welcome{
+    position:fixed;inset:0;z-index:60;overflow-y:auto;
+    background:radial-gradient(1100px 700px at 80% -10%, #182040 0%, transparent 60%),
+               radial-gradient(900px 600px at -10% 110%, #14224a 0%, transparent 55%),
+               var(--bg);
+  }
+  .wel-wrap{max-width:1080px;margin:0 auto;padding:48px 28px 64px}
+  .wel-head{text-align:center;margin-bottom:8px}
+  .wel-head .brand{margin-bottom:14px}
+  .wel-head h1{font-size:30px;margin:0;font-weight:750;letter-spacing:.3px}
+  .wel-head .tagline{font-size:14px;margin-top:8px}
+  .wel-lead{max-width:680px;margin:14px auto 0;color:var(--muted);font-size:14px;line-height:1.7;text-align:center}
+  .wel-badge{display:inline-block;margin:18px 0 8px;font-size:11px;color:var(--gold);
+    border:1px solid #6a571f;background:#251d0b;border-radius:20px;padding:5px 14px}
+  .wel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:30px}
+  @media(max-width:820px){.wel-grid{grid-template-columns:1fr}}
+  .wel-legend{display:flex;flex-direction:column;gap:9px;margin-top:26px;
+    background:#0e1426;border:1px solid var(--border);border-radius:11px;padding:15px 20px}
+  .wel-legend .lg-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px}
+  .wel-legend .lg-item{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted)}
+  .wel-legend .lg-item b{color:var(--text);font-weight:600}
+  .wel-legend .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .wel-card{background:linear-gradient(180deg,var(--panel),#11182c);border:1px solid var(--border);
+    border-radius:var(--radius);padding:20px}
+  .wel-card .wc-head{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  .wel-card .wc-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+  .wel-card h3{margin:0;font-size:15px;font-weight:650}
+  .wel-card .wc-sub{color:var(--muted);font-size:12px;margin:2px 0 14px}
+  .wc-opt{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:13px}
+  .wc-opt .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .wc-opt .soon{margin-left:auto;font-size:10px;color:var(--muted2);border:1px solid var(--border2);
+    border-radius:20px;padding:1px 8px}
+  .wc-hint{margin-top:14px;font-size:12px;color:var(--muted);background:#0e1426;border:1px solid var(--border);
+    border-radius:9px;padding:11px 13px;line-height:1.6}
+  .wc-hint code,.wc-hint .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--accent2);font-size:11.5px}
+  .wel-cta{display:flex;gap:12px;justify-content:center;align-items:center;margin-top:34px;flex-wrap:wrap}
+  .wel-cta .go{background:linear-gradient(135deg,var(--accent),#5a57e0);color:#fff;border:none;border-radius:11px;
+    padding:14px 30px;font-weight:650;font-size:14px;cursor:pointer;transition:.15s}
+  .wel-cta .go:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(109,106,245,.4)}
+  .wel-cta .ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:11px;
+    padding:14px 22px;font-weight:550;font-size:13px;cursor:pointer}
+  .wel-cta .ghost:hover{color:var(--text);border-color:var(--accent)}
+  .wel-foot{text-align:center;color:var(--muted2);font-size:11.5px;margin-top:22px;line-height:1.7}
+
+  /* ---------- LOGIN ---------- */
+  #login{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(900px 600px at 50% 0%, #1a2045 0%, transparent 60%), var(--bg);
+    z-index:50;
+  }
+  .login-card{
+    width:420px;max-width:92vw;background:linear-gradient(180deg,#161e36,#111729);
+    border:1px solid var(--border);border-radius:20px;padding:38px 34px;box-shadow:var(--shadow);
+    text-align:center;
+  }
+  .brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px}
+  .brand .logo{width:40px;height:40px}
+  .brand h1{font-size:26px;margin:0;letter-spacing:.5px;font-weight:700}
+  .brand h1 b{color:var(--accent)}
+  .tagline{color:var(--muted);font-size:13px;margin:4px 0 26px}
+  .ms-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
+    background:#fff;color:#1b1b1b;border:none;border-radius:10px;padding:13px;
+    font-weight:600;font-size:14px;cursor:pointer;transition:.15s;
+  }
+  .ms-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .ms-grid{width:18px;height:18px;display:grid;grid-template-columns:1fr 1fr;grid-gap:2px}
+  .ms-grid i{display:block}
+  .login-foot{margin-top:22px;font-size:11.5px;color:var(--muted2);line-height:1.6}
+  .login-domain{margin-top:18px;font-size:12px;color:var(--muted);background:#0e1426;border:1px solid var(--border);
+    border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:8px;justify-content:center}
+  .pill-demo{display:inline-block;margin-top:16px;font-size:11px;color:var(--gold);
+    border:1px solid #6a5party;border:1px solid #6a571f;background:#251d0b;border-radius:20px;padding:4px 12px}
+
+  /* ---------- APP SHELL ---------- */
+  #app{display:none;height:100vh;grid-template-columns:248px 1fr;grid-template-rows:1fr}
+  .sidebar{
+    background:linear-gradient(180deg,#0e1426,#0b0f1e);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;padding:18px 14px;overflow-y:auto;
+  }
+  .side-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px}
+  .side-brand .logo{width:30px;height:30px}
+  .side-brand .name{font-weight:700;font-size:18px;letter-spacing:.4px}
+  .side-brand .name b{color:var(--accent)}
+  .nav-sec{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);
+    padding:14px 10px 6px;font-weight:600}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;color:var(--muted);
+    cursor:pointer;font-size:13.5px;font-weight:500;transition:.13s;margin-bottom:2px;
+  }
+  .nav-item:hover{background:#161f38;color:var(--text)}
+  .nav-item.active{background:var(--accent-soft);color:#fff}
+  .nav-item.active .ic{color:var(--accent)}
+  .nav-item .ic{width:18px;height:18px;flex:none;color:var(--muted)}
+  .nav-item .badge{margin-left:auto;background:#2a3656;color:var(--text);border-radius:20px;
+    font-size:10px;padding:1px 7px;font-weight:600}
+  .side-foot{margin-top:auto;padding:12px 8px 4px;border-top:1px solid var(--border)}
+  .user-chip{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:12px}
+  .user-chip .role{color:var(--muted2);font-size:11px}
+  .logout{margin-left:auto;color:var(--muted2);cursor:pointer;font-size:11px}
+  .logout:hover{color:var(--red)}
+
+  .main{overflow-y:auto;height:100vh}
+  .topbar{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);
+    background:rgba(10,14,26,.78);border-bottom:1px solid var(--border);
+    padding:16px 30px;display:flex;align-items:center;gap:16px}
+  .topbar h2{margin:0;font-size:18px;font-weight:650}
+  .topbar .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .topbar .spacer{flex:1}
+  .env-tag{font-size:11px;color:var(--accent2);border:1px solid #1f4a44;background:#0c2220;
+    padding:4px 10px;border-radius:20px;font-weight:600}
+  .content{padding:26px 30px 60px;max-width:1280px}
+
+  /* ---------- COMPONENTS ---------- */
+  .grid{display:grid;gap:16px}
+  .cols-4{grid-template-columns:repeat(4,1fr)}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  .cols-2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:1100px){.cols-4{grid-template-columns:repeat(2,1fr)}.cols-3{grid-template-columns:1fr 1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),#11182c);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px}
+  .card h3{margin:0 0 3px;font-size:14px;font-weight:650}
+  .card .desc{color:var(--muted);font-size:12.5px;margin:0 0 14px;line-height:1.5}
+  .kpi .label{color:var(--muted);font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px}
+  .kpi .val{font-size:28px;font-weight:720;margin-top:8px;letter-spacing:-.5px}
+  .kpi .delta{font-size:11.5px;margin-top:4px}
+  .up{color:var(--green)} .down{color:var(--red)}
+  .ic-box{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .sectiontitle{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);
+    font-weight:650;margin:30px 0 14px}
+  .sectiontitle:first-child{margin-top:0}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:var(--muted2);font-weight:600;font-size:11px;text-transform:uppercase;
+    letter-spacing:.5px;padding:10px 12px;border-bottom:1px solid var(--border)}
+  td{padding:11px 12px;border-bottom:1px solid #1b2335;color:var(--text)}
+  tr:hover td{background:#121a2e}
+  .tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600}
+  .t-prod{background:#3a1320;color:#ff9bb0;border:1px solid #5a2030}
+  .t-stage{background:#2a230a;color:var(--amber);border:1px solid #4a3a12}
+  .t-dev{background:#0c2220;color:var(--accent2);border:1px solid #1f4a44}
+  .t-test{background:#16203f;color:var(--blue);border:1px solid #28406a}
+  .t-ok{background:#0d2417;color:var(--green);border:1px solid #1d4a32}
+  .t-run{background:#161f38;color:var(--accent);border:1px solid #2f3a66}
+  .t-wait{background:#2a230a;color:var(--amber);border:1px solid #4a3a12}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 18px;
+    font-weight:600;font-size:13.5px;cursor:pointer;transition:.14s;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;border:1px solid var(--border2);color:var(--text)}
+  .btn.ghost:hover{background:#161f38}
+  .btn.sm{padding:7px 13px;font-size:12.5px}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  label.fl{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px;font-weight:600}
+  input.fi,select.fi,textarea.fi{width:100%;background:#0d1322;border:1px solid var(--border2);
+    border-radius:9px;padding:11px 12px;color:var(--text);font-size:13.5px;font-family:inherit}
+  input.fi:focus,select.fi:focus,textarea.fi:focus{outline:none;border-color:var(--accent)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  /* template select cards */
+  .tpl{border:1px solid var(--border);background:#10172b;border-radius:12px;padding:16px;cursor:pointer;transition:.14s}
+  .tpl:hover{border-color:var(--border2);background:#13203c}
+  .tpl.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;background:#141d3a}
+  .tpl .tname{font-weight:650;font-size:14px;display:flex;align-items:center;gap:8px}
+  .tpl .tspec{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.6}
+  .tpl .chips{margin-top:10px;display:flex;flex-wrap:wrap;gap:5px}
+  .chip{font-size:10.5px;background:#1a2440;border:1px solid var(--border2);color:var(--muted);
+    padding:2px 8px;border-radius:6px}
+
+  /* chat */
+  .chat-wrap{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start}
+  .chat{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:480px}
+  .chat-log{flex:1;overflow-y:auto;padding:6px 4px 12px;display:flex;flex-direction:column;gap:14px}
+  .msg{display:flex;gap:11px;max-width:90%}
+  .msg .av{width:30px;height:30px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .msg.bot .av{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  .msg.me{align-self:flex-end;flex-direction:row-reverse}
+  .msg.me .av{background:#2a3656}
+  .bubble{background:#141d33;border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.6}
+  .msg.me .bubble{background:#1c2545}
+  .bubble .rec{margin-top:10px;background:#0e1730;border:1px solid var(--border2);border-radius:10px;padding:12px}
+  .bubble code{background:#0a1020;padding:1px 6px;border-radius:5px;color:var(--accent2);font-size:12px}
+  .costline{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #243049;font-size:13px}
+  .costline:last-child{border:none;font-weight:700;color:#fff;padding-top:9px}
+  .chat-input{display:flex;gap:10px;margin-top:12px}
+  .chat-input input{flex:1}
+  .quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .quick span{font-size:12px;background:#161f38;border:1px solid var(--border2);color:var(--muted);
+    padding:6px 11px;border-radius:18px;cursor:pointer;transition:.13s}
+  .quick span:hover{color:#fff;border-color:var(--accent)}
+
+  /* tabs */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:18px}
+  .tab{padding:10px 16px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;
+    border-bottom:2px solid transparent;margin-bottom:-1px;transition:.13s}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:#fff;border-bottom-color:var(--accent)}
+  /* json analyzer */
+  .drop{border:1.5px dashed var(--border2);border-radius:12px;padding:22px;text-align:center;
+    background:#0d1322;cursor:pointer;transition:.14s}
+  .drop:hover{border-color:var(--accent);background:#101a30}
+  .drop.over{border-color:var(--accent2);background:#0c2220}
+  .issue{display:flex;gap:12px;padding:13px;border-radius:10px;border:1px solid var(--border);
+    background:#10172b;margin-bottom:10px}
+  .issue .sev{width:8px;border-radius:6px;flex:none}
+  .issue.high .sev{background:#f87171} .issue.medium .sev{background:#fbbf24} .issue.low .sev{background:#56a8ff}
+  .issue .it{font-weight:650;font-size:13px;display:flex;align-items:center;gap:8px}
+  .issue .id{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.5}
+  .sevtag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px}
+  .sevtag.high{background:#3a1320;color:#ff9bb0} .sevtag.medium{background:#2a230a;color:var(--amber)} .sevtag.low{background:#16203f;color:var(--blue)}
+  .ok-card{background:#0d2417;border:1px solid #1d4a32;border-radius:10px;padding:13px;color:#8ee0b5;font-size:13px}
+
+  /* pipeline */
+  .pipe{display:flex;flex-direction:column;gap:2px}
+  .pstep{display:flex;align-items:flex-start;gap:14px;padding:14px 0;position:relative}
+  .pstep .marker{width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    background:#16203c;border:2px solid var(--border2);color:var(--muted);font-size:13px;z-index:2}
+  .pstep.done .marker{background:#0d2417;border-color:var(--green);color:var(--green)}
+  .pstep.active .marker{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .pstep .line{position:absolute;left:14px;top:30px;bottom:-14px;width:2px;background:var(--border)}
+  .pstep:last-child .line{display:none}
+  .pstep.done .line{background:var(--green)}
+  .pstep .ptitle{font-weight:600;font-size:14px}
+  .pstep .pdesc{color:var(--muted);font-size:12.5px;margin-top:3px}
+  .pstep .plog{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:11.5px;color:var(--muted2);
+    margin-top:7px;white-space:pre-wrap;background:#0a0f1d;border:1px solid var(--border);border-radius:8px;
+    padding:9px 11px;max-height:0;overflow:hidden;transition:max-height .4s}
+  .pstep.active .plog,.pstep.done .plog{max-height:160px}
+
+  .term{background:#0a0f1d;border:1px solid var(--border);border-radius:12px;padding:16px;
+    font-family:"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;line-height:1.7;color:#cdd6ec;
+    max-height:340px;overflow-y:auto}
+  .term .g{color:var(--green)} .term .y{color:var(--amber)} .term .b{color:var(--accent2)} .term .m{color:var(--muted2)}
+
+  /* observability */
+  .panel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .ob-panel{background:#0d1322;border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .ob-panel .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .ob-panel .ph .nm{font-size:12.5px;color:var(--muted);font-weight:600}
+  .ob-panel .ph .cur{font-size:18px;font-weight:700}
+  .ob-panel canvas{width:100%!important;height:120px!important}
+
+  .kb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .kb-card{background:#10172b;border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.14s}
+  .kb-card:hover{border-color:var(--accent);background:#13203c;transform:translateY(-2px)}
+  .kb-card .kt{font-weight:650;font-size:13.5px;margin-top:10px}
+  .kb-card .kd{color:var(--muted);font-size:12px;margin-top:5px;line-height:1.5}
+  .kb-card .breadcrumb{font-size:10.5px;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(5,8,16,.7);backdrop-filter:blur(3px);z-index:60;
+    display:none;align-items:center;justify-content:center;padding:30px}
+  .modal{background:linear-gradient(180deg,#141b30,#0f1626);border:1px solid var(--border2);border-radius:16px;
+    width:640px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow)}
+  .modal-h{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:#141b30}
+  .modal-b{padding:22px 24px;line-height:1.65}
+  .modal-b h4{margin:18px 0 8px;font-size:14px}
+  .modal-b p{color:#c3cce0;margin:0 0 10px}
+  .modal-b ul{color:#c3cce0;padding-left:18px;margin:0 0 12px}
+  .modal-b li{margin:5px 0}
+  .x{margin-left:auto;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
+  .x:hover{color:#fff}
+
+  .banner{background:linear-gradient(90deg,#141d3a,#101627);border:1px solid var(--border2);border-radius:12px;
+    padding:14px 18px;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+  .banner b{color:var(--text)}
+  .toast{position:fixed;bottom:26px;right:26px;background:#13203c;border:1px solid var(--accent);
+    border-radius:11px;padding:14px 18px;box-shadow:var(--shadow);z-index:80;display:flex;align-items:center;gap:11px;
+    font-size:13.5px;transform:translateY(120px);opacity:0;transition:.35s}
+  .toast.show{transform:translateY(0);opacity:1}
+  .bar{height:7px;border-radius:5px;background:#1a2440;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:middle}
+  .muted{color:var(--muted)} .small{font-size:12px} .mono{font-family:"SF Mono",Menlo,Consolas,monospace}
+  .mt{margin-top:16px}.mt2{margin-top:26px}
+  .flex{display:flex;align-items:center;gap:10px}
+  .spread{display:flex;align-items:center;justify-content:space-between}
+</style>
+</head>
+<body>
+
+<!-- ========================= WELCOME / ONBOARDING ========================= -->
+<div id="welcome">
+  <div class="wel-wrap">
+    <div class="wel-head">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" style="width:44px;height:44px"><circle cx="24" cy="24" r="22" stroke="#6d6af5" stroke-width="2.5"/><path d="M14 30V18l10 8 10-8v12" stroke="#2dd4bf" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="3" fill="#6d6af5"/></svg>
+        <h1>Maestro</h1>
+      </div>
+      <div class="tagline">Self-service Atlas, orchestrated.</div>
+      <div class="wel-lead">
+        Uma <b>landing zone</b> é um ambiente de nuvem pré-configurado e <i>well-architected</i> — um conjunto de padrões, ferramentas e configurações que definem, de antemão, os requisitos de segurança, confiabilidade, performance e custo da organização. O <b>Maestro</b> aplica essa ideia ao MongoDB Atlas: dá aos times acesso self-service a clusters que já nascem dentro desses guardrails, sem que cada desenvolvedor precise reconfigurar segurança, rede ou billing do zero.
+      </div>
+      <div class="wel-badge">⬤ Protótipo não-oficial · baseado nos conceitos públicos de <a href="https://www.mongodb.com/docs/atlas/architecture/current/landing-zone/" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:underline">Atlas Landing Zone</a></div>
+    </div>
+
+    <div class="wel-legend">
+      <div class="lg-title">Legenda:</div>
+      <span class="lg-item"><span class="dot" style="background:#34d399"></span> <b>Roda com MongoDB Atlas e suas APIs</b></span>
+      <span class="lg-item"><span class="dot" style="background:#fbbf24"></span> <b>Requer instalação da ferramenta ou credencial de acesso no seu ambiente</b></span>
+    </div>
+
+    <div class="wel-grid" id="welGrid"></div>
+
+    <div class="wel-cta">
+      <button class="go" onclick="enterLogin()">Começar →</button>
+      <button class="ghost" onclick="skipToApp()">Já conheço — ir direto à demo</button>
+    </div>
+    <div class="wel-foot">
+      Repo &amp; instruções completas: <span class="mono" style="color:var(--accent2)">github.com/carimeb/maestro-atlas-landing-zone</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= LOGIN ========================= -->
+<div id="login">
+  <div class="login-card">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#6d6af5" stroke-width="2.5"/><path d="M14 30V18l10 8 10-8v12" stroke="#2dd4bf" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="3" fill="#6d6af5"/></svg>
+      <h1>Maestro</h1>
+    </div>
+    <div class="tagline">Self-service Atlas, orchestrated.</div>
+    <button class="ms-btn" onclick="login()">
+      <span class="ms-grid"><i style="background:#f25022"></i><i style="background:#7fba00"></i><i style="background:#00a4ef"></i><i style="background:#ffb900"></i></span>
+      Entrar com Microsoft
+    </button>
+    <div class="login-domain">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" stroke="#8b97b3" stroke-width="1.6"/><path d="M2 12h20M12 2c3 3 3 17 0 20M12 2c-3 3-3 17 0 20" stroke="#8b97b3" stroke-width="1.4"/></svg>
+      contoso.onmicrosoft.com · SSO federado (Azure AD)
+    </div>
+    <span class="pill-demo">⬤ Protótipo — autenticação simulada</span>
+    <div class="login-foot">
+      Plataforma de governança e provisionamento self-service para MongoDB Atlas.<br/>
+      Acesso protegido por Single Sign-On corporativo e MFA.
+    </div>
+  </div>
+</div>
+
+<!-- ========================= APP ========================= -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="side-brand">
+      <svg class="logo" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#6d6af5" stroke-width="2.5"/><path d="M14 30V18l10 8 10-8v12" stroke="#2dd4bf" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="3" fill="#6d6af5"/></svg>
+      <span class="name">Maestro</span>
+    </div>
+
+    <div class="nav-sec">Visão geral</div>
+    <div class="nav-item active" data-screen="dashboard" onclick="nav('dashboard')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      Dashboard
+    </div>
+
+    <div class="nav-sec">Self-service</div>
+    <div class="nav-item" data-screen="catalog" onclick="nav('catalog')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.7"/></svg>
+      Catálogo de templates
+    </div>
+    <div class="nav-item" data-screen="request" onclick="nav('request')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+      Solicitar cluster
+    </div>
+    <div class="nav-item" data-screen="copilot" onclick="nav('copilot')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="18" cy="17" r="2.4" stroke="currentColor" stroke-width="1.4"/></svg>
+      Maestro Copilot
+    </div>
+
+    <div class="nav-sec">Operação</div>
+    <div class="nav-item" data-screen="pipeline" onclick="nav('pipeline')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.4" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.4" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M8.4 6H14a3 3 0 013 3M8.4 18H14a3 3 0 003-3" stroke="currentColor" stroke-width="1.6"/></svg>
+      Provisionamento
+    </div>
+    <div class="nav-item" data-screen="observability" onclick="nav('observability')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 16l5-6 4 4 5-7 4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Observabilidade
+    </div>
+    <div class="nav-item" data-screen="agents" onclick="nav('agents')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 20a7 7 0 0114 0" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v1.6M19 5l-1 1M22 12h-1.6M5 6L4 5M3.6 12H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Ops Copilot
+    </div>
+    <div class="nav-item" data-screen="memory" onclick="nav('memory')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 4v16M4 9h5M4 15h5M15 8h2M15 12h2M15 16h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Memória do agente
+      <span class="badge" style="background:linear-gradient(135deg,#f0b860,#2dd4bf);color:#0a0e1a">novo</span>
+    </div>
+    <div class="nav-item" data-screen="finops" onclick="nav('finops')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7v10M9.5 9.5C9.5 8 10.6 7.5 12 7.5s2.5.6 2.5 2-1.1 1.8-2.5 2-2.5.5-2.5 2 1.1 2 2.5 2 2.5-.6 2.5-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      FinOps
+    </div>
+    <div class="nav-item" data-screen="guardrails" onclick="nav('guardrails')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 8.4-7 10-4-1.6-7-5.6-7-10V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Guardrails &amp; Segurança
+    </div>
+    <div class="nav-item" data-screen="kb" onclick="nav('kb')">
+      <svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M4 5a2 2 0 012-2h6v18H6a2 2 0 01-2-2V5z" stroke="currentColor" stroke-width="1.6"/><path d="M20 5a2 2 0 00-2-2h-6v18h6a2 2 0 002-2V5z" stroke="currentColor" stroke-width="1.6"/></svg>
+      Base de conhecimento
+    </div>
+
+    <div class="side-foot">
+      <div class="user-chip">
+        <div class="avatar" id="avatar">CB</div>
+        <div>
+          <div id="uname">Cacá Bumaruf</div>
+          <div class="role">Platform Engineering</div>
+        </div>
+        <span class="logout" onclick="logout()">Sair</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2 id="pageTitle">Dashboard</h2>
+        <div class="sub" id="pageSub">Visão geral da sua landing zone Atlas</div>
+      </div>
+      <div class="spacer"></div>
+      <span class="env-tag" id="orgTag">◈ Org: contoso-atlas-prod</span>
+    </div>
+    <div class="content" id="view"></div>
+  </main>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   MAESTRO — protótipo de plataforma de automação de deployments Atlas
+   Arquitetura: camada de PROVIDERS desacoplada da UI.
+   Hoje retorna dados MOCKADOS. Para ligar o real, troque o corpo das
+   funções em Providers.* por chamadas fetch() ao Atlas Admin API e à
+   API de LLM escolhida — Anthropic (Claude) ou OpenAI. A UI não muda.
+   ===================================================================== */
+
+/* ---------------- TIERS & PRICING (estimativas) ----------------
+   Preços ~ on-demand AWS (USD/h), cluster dedicado replica-set 3 nós.
+   Valores aproximados para fins de estimativa em protótipo.        */
+const TIERS = [
+  {name:'M10',  ram:2,   vcpu:2,  storage:10,   hourly:0.08,  conns:1500},
+  {name:'M20',  ram:4,   vcpu:2,  storage:20,   hourly:0.20,  conns:3000},
+  {name:'M30',  ram:8,   vcpu:2,  storage:40,   hourly:0.54,  conns:3000},
+  {name:'M40',  ram:16,  vcpu:4,  storage:80,   hourly:1.04,  conns:6000},
+  {name:'M50',  ram:32,  vcpu:8,  storage:160,  hourly:2.00,  conns:16000},
+  {name:'M60',  ram:64,  vcpu:16, storage:320,  hourly:3.95,  conns:32000},
+  {name:'M80',  ram:128, vcpu:32, storage:750,  hourly:7.42,  conns:96000},
+  {name:'M140', ram:192, vcpu:48, storage:1000, hourly:9.40,  conns:96000},
+  {name:'M200', ram:256, vcpu:64, storage:1500, hourly:14.59, conns:128000},
+  {name:'M300', ram:384, vcpu:96, storage:2000, hourly:24.50, conns:128000},
+];
+const REGIONS = {
+  'sa-east-1':{label:'São Paulo (sa-east-1)', mult:1.46},
+  'us-east-1':{label:'N. Virginia (us-east-1)', mult:1.0},
+  'us-west-2':{label:'Oregon (us-west-2)', mult:1.0},
+  'eu-west-1':{label:'Irlanda (eu-west-1)', mult:1.08},
+  'eu-central-1':{label:'Frankfurt (eu-central-1)', mult:1.12},
+};
+const PRICING = {
+  storagePerGB:0.25,   // USD/GB-mês (storage provisionado adicional)
+  backupPerGB:0.20,    // USD/GB-mês (cloud backup snapshot)
+  networkPct:0.10,     // +10% tráfego de rede (premissa do cliente)
+  usdBrl:5.05,
+};
+
+/* ---------------- COST ENGINE ---------------- */
+function estimateCost(opts){
+  // opts: tier(name), region, nodes(replicas extra/shards mult), storageGB, env
+  const t = TIERS.find(x=>x.name===opts.tier) || TIERS[0];
+  const region = REGIONS[opts.region] || REGIONS['us-east-1'];
+  const nodes = opts.nodes || 1;            // multiplicador (1 = replica-set padrão)
+  const storageGB = Math.max(opts.storageGB||t.storage, t.storage);
+  const hours = 730;
+
+  const compute = t.hourly * hours * region.mult * nodes;
+  const extraStorage = Math.max(0, storageGB - t.storage);
+  const storage = extraStorage * PRICING.storagePerGB * nodes;
+  const backup  = storageGB * PRICING.backupPerGB;
+  const sub = compute + storage + backup;
+  const network = sub * PRICING.networkPct;
+  const total = sub + network;
+  return {tier:t, region, nodes, storageGB, compute, storage, backup, network, total,
+          totalBrl: total*PRICING.usdBrl};
+}
+const fmtUsd = v => '$'+v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmtUsd2 = v => '$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtBrl = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+/* ---------------- SIZING ENGINE ---------------- */
+function recommendTier({dataGB, workingSetGB, opsSec, conns}){
+  dataGB = dataGB||0; opsSec = opsSec||0; conns = conns||0;
+  if(!workingSetGB) workingSetGB = Math.max(1, dataGB*0.10); // working set ~ 10% se não informado
+  const reasons=[];
+  let pick = TIERS.find(t=>{
+    const ramOk = t.ram >= workingSetGB;
+    const storeOk = t.storage >= dataGB*1.25;     // 25% de folga
+    const connOk = t.conns >= conns;
+    const opsOk = (t.vcpu*8000) >= opsSec;          // ~8k ops/s por vCPU (heurística)
+    return ramOk && storeOk && connOk && opsOk;
+  }) || TIERS[TIERS.length-1];
+
+  reasons.push(`Working set estimado de <code>${workingSetGB.toFixed(0)} GB</code> precisa caber em RAM → tier com ≥ ${pick.ram} GB de memória.`);
+  reasons.push(`Volume de dados de <code>${dataGB} GB</code> + 25% de folga → ≥ ${Math.ceil(dataGB*1.25)} GB de storage.`);
+  if(conns) reasons.push(`Pico de <code>${conns.toLocaleString('pt-BR')}</code> conexões → limite do tier de ${pick.conns.toLocaleString('pt-BR')}.`);
+  if(opsSec) reasons.push(`Throughput de <code>${opsSec.toLocaleString('pt-BR')}</code> ops/s → ${pick.vcpu} vCPUs.`);
+  return {tier:pick, workingSetGB, reasons};
+}
+
+/* ---------------- MOCK DATA ---------------- */
+const MOCK = {
+  user:{name:'Cacá Bumaruf', initials:'CB', team:'Platform Engineering'},
+  clusters:[
+    {name:'pix-ledger-prod',     env:'prod',  tier:'M50', region:'sa-east-1', team:'Pagamentos',  status:'running', cpu:62, conns:8400, since:'2026-02-11'},
+    {name:'fraud-ml-prod',       env:'prod',  tier:'M60', region:'sa-east-1', team:'Risco',       status:'running', cpu:71, conns:11200, since:'2026-01-08'},
+    {name:'catalog-search-stage',env:'stage', tier:'M30', region:'us-east-1', team:'E-commerce',  status:'running', cpu:34, conns:1900, since:'2026-03-22'},
+    {name:'chat-rag-dev',        env:'dev',   tier:'M20', region:'us-east-1', team:'IA Generativa',status:'running',cpu:18, conns:240,  since:'2026-04-30'},
+    {name:'billing-core-prod',   env:'prod',  tier:'M40', region:'eu-west-1', team:'Faturamento', status:'running', cpu:48, conns:5100, since:'2025-11-15'},
+  ],
+  requests:[
+    {id:'REQ-2041', who:'maria.alves', cluster:'recs-engine-dev', tier:'M20', env:'dev',  status:'provisioned', when:'há 2h'},
+    {id:'REQ-2040', who:'jp.santos',   cluster:'orders-prod',     tier:'M50', env:'prod', status:'awaiting',     when:'há 5h'},
+    {id:'REQ-2039', who:'lucas.melo',  cluster:'audit-logs-stage',tier:'M30', env:'stage',status:'provisioned', when:'ontem'},
+    {id:'REQ-2038', who:'ana.costa',   cluster:'mega-batch-prod', tier:'M200',env:'prod', status:'denied',       when:'ontem'},
+  ],
+  teamsSpend:[
+    {team:'Pagamentos', usd:18420}, {team:'Risco', usd:14080}, {team:'E-commerce', usd:6240},
+    {team:'Faturamento', usd:8650}, {team:'IA Generativa', usd:3120},
+  ],
+};
+
+const TEMPLATES = [
+  {id:'web-std',  name:'Web App Standard', icon:'🌐', tier:'M30', env:'dev/test/stage',
+   spec:'Replica-set 3 nós · Backup diário · TLS · IP Access List',
+   chips:['Encryption at-rest','Backup 7d','Auth SCRAM','Single-region']},
+  {id:'oltp-prod',name:'OLTP Produção', icon:'⚡', tier:'M50', env:'prod',
+   spec:'Replica-set 3 nós · Backup contínuo (PITR) · BYOK · Private Link',
+   chips:['BYOK (KMS)','PITR','Private Endpoint','Audit log','Multi-AZ']},
+  {id:'analytics',name:'Analytics / BI', icon:'📊', tier:'M40', env:'stage/prod',
+   spec:'Nó analítico dedicado · Data tiering (Online Archive)',
+   chips:['Analytics node','Online Archive','Read-only users','Backup 30d']},
+  {id:'genai',    name:'GenAI / Vector Search', icon:'🧠', tier:'M40', env:'dev/prod',
+   spec:'Atlas Vector Search habilitado · Search nodes',
+   chips:['Vector Search','Search nodes','BYOK','PITR']},
+  {id:'finserv',  name:'FinServ Regulado', icon:'🏦', tier:'M60', env:'prod',
+   spec:'Compliance-ready · BYOK · Audit · Multi-region DR',
+   chips:['BYOK obrigatório','Audit completo','Multi-region DR','Private Link','Data residency']},
+  {id:'sandbox',  name:'Sandbox / POC', icon:'🧪', tier:'M10', env:'dev',
+   spec:'Cluster compartilhado · Auto-pause · Sem dado sensível',
+   chips:['Auto-pause','Backup off','Public (restrito)','TTL 30d']},
+];
+
+/* =====================================================================
+   PROVIDERS  (swap mock → real aqui)
+   ===================================================================== */
+const Providers = {
+  atlas:{
+    mode:'mock',
+    async listClusters(){ return MOCK.clusters; },
+    // REAL: GET https://cloud.mongodb.com/api/atlas/v2/groups/{id}/clusters (Digest auth)
+    async createCluster(spec){ await wait(400); return {ok:true, spec}; }
+  },
+  // Provider de LLM — plugável: Claude (Anthropic) OU OpenAI. A UI não muda.
+  llm:{
+    mode:'mock',
+    provider:'claude', // 'claude' | 'openai'
+    // REAL (Claude):  POST https://api.anthropic.com/v1/messages
+    //   headers: x-api-key, anthropic-version, anthropic-dangerous-direct-browser-access:true
+    // REAL (OpenAI):  POST https://api.openai.com/v1/chat/completions
+    //   headers: Authorization: Bearer OPENAI_API_KEY
+    //   system prompt = especialista em sizing Atlas + tabela TIERS/PRICING (igual nos dois)
+    async sizing(message, history){
+      await wait(650);
+      return mockSizingReply(message);
+    }
+  }
+};
+// alias retrocompatível — chamadas a Providers.claude continuam funcionando
+Providers.claude = Providers.llm;
+const wait = ms => new Promise(r=>setTimeout(r,ms));
+
+/* =====================================================================
+   APP NAV / SHELL
+   ===================================================================== */
+function login(){
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='grid';
+  nav('dashboard');
+}
+function enterLogin(){
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('login').style.display='flex';
+}
+function skipToApp(){ login(); }
+function logout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('welcome').style.display='block';
+  document.getElementById('login').style.display='none';
+}
+
+/* ---- Catálogo de camadas plugáveis (welcome screen) ----
+   ready: 'now'    = roda hoje só com MongoDB Atlas + Claude (verde)
+   ready: 'client' = conector codado, requer credencial/ambiente do cliente (âmbar) */
+function renderWelcomeGrid(){
+  const WELCOME_LAYERS = [
+  {
+    title:'Autenticação & Identidade', color:'#6d6af5',
+    icon:'<path d="M12 2l7 3v6c0 4.4-3 8.4-7 10-4-1.6-7-5.6-7-10V5l7-3z" stroke="#6d6af5" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.2" stroke="#6d6af5" stroke-width="1.5"/>',
+    opts:[
+      {name:'Microsoft Entra ID / AD', ready:'client'},
+      {name:'Okta', ready:'client'},
+      {name:'AWS IAM', ready:'client'},
+      {name:'Google Workspace', ready:'client'},
+    ],
+    hint:'Grupos do IdP viram roles do Atlas (RBAC). Defina o provider em <code>terraform/modules/identity</code> e mapeie grupos → roles no <code>*.tfvars</code>.'
+  },
+  {
+    title:'Observabilidade', color:'#2dd4bf',
+    icon:'<path d="M3 16l5-6 4 4 5-7 4 5" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>',
+    opts:[
+      {name:'Atlas metrics (endpoint Prometheus nativo)', ready:'now'},
+      {name:'Grafana', ready:'client'},
+      {name:'Prometheus (self-hosted)', ready:'client'},
+      {name:'Datadog', ready:'client'},
+    ],
+    hint:'O Atlas expõe métricas nativamente; Grafana/Datadog/Prometheus consomem como datasource na instância do cliente. Configure em <code>docs/observability-*.md</code>.'
+  },
+  {
+    title:'Base de conhecimento (RAG)', color:'#f0b860',
+    icon:'<path d="M4 5a2 2 0 012-2h6v18H6a2 2 0 01-2-2V5z" stroke="#f0b860" stroke-width="1.6"/><path d="M20 5a2 2 0 00-2-2h-6v18h6a2 2 0 002-2V5z" stroke="#f0b860" stroke-width="1.6"/>',
+    opts:[
+      {name:'Atlas Vector Search (índice + embeddings)', ready:'now'},
+      {name:'Confluence', ready:'client'},
+      {name:'SharePoint', ready:'client'},
+    ],
+    hint:'Outros serviços de vector search e embeddings precisam ser codados.'
+  },
+  {
+    title:'Cloud & Pareamento de rede', color:'#56a8ff',
+    icon:'<path d="M6 16a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 16H6z" stroke="#56a8ff" stroke-width="1.6" stroke-linejoin="round"/>',
+    opts:[
+      {name:'AWS — VPC Peering / PrivateLink', ready:'client'},
+      {name:'GCP — VPC Peering / PSC', ready:'client'},
+      {name:'Azure — VNet Peering / Private Endpoint', ready:'client'},
+    ],
+    hint:'Peering por provider. Preencha IDs da VPC/VNet e credenciais do cliente em <code>terraform/modules/network-*</code>.'
+  },
+  {
+    title:'FinOps', color:'#34d399',
+    icon:'<circle cx="12" cy="12" r="9" stroke="#34d399" stroke-width="1.6"/><path d="M12 7v10M9.5 9.5C9.5 8 10.6 7.5 12 7.5s2.5.6 2.5 2-1.1 1.8-2.5 2-2.5.5-2.5 2 1.1 2 2.5 2 2.5-.6 2.5-2" stroke="#34d399" stroke-width="1.4" stroke-linecap="round"/>',
+    opts:[
+      {name:'Atlas Billing APIs', ready:'now'},
+      {name:'Chargeback por tag (cost-center)', ready:'now'},
+      {name:'Right-sizing automático', ready:'now'},
+    ],
+    hint:'Custos vêm das <code>Atlas Billing APIs</code> e são rateados pelas tags obrigatórias. Sem dependência externa para começar.'
+  },
+  {
+    title:'Camada de agentes (IA)', color:'#a78bfa',
+    icon:'<circle cx="12" cy="8" r="3.2" stroke="#a78bfa" stroke-width="1.6"/><path d="M5 20a7 7 0 0114 0" stroke="#a78bfa" stroke-width="1.6"/>',
+    opts:[
+      {name:'MongoDB MCP Server (ferramentas)', ready:'now'},
+      {name:'Agent Skills (playbooks)', ready:'now'},
+      {name:'Memória curto/longo prazo (Atlas)', ready:'now'},
+    ],
+    hint:'MCP + Skills + memória editável em MongoDB. Só precisa da connection string do Atlas e de uma chave de LLM — <code>ANTHROPIC_API_KEY</code> (Claude) ou <code>OPENAI_API_KEY</code> (OpenAI).'
+  },
+  ];
+  const COLORS={now:'#34d399', client:'#fbbf24'};
+  const grid=document.getElementById('welGrid');
+  if(!grid) return;
+  grid.innerHTML = WELCOME_LAYERS.map(l=>{
+    const nowN=l.opts.filter(o=>o.ready==='now').length;
+    const opts=l.opts.map(o=>`<div class="wc-opt"><span class="dot" style="background:${COLORS[o.ready]}"></span><span>${o.name}</span>${o.ready==='client'?'<span class="soon">requer credencial</span>':''}</div>`).join('');
+    return `<div class="wel-card">
+      <div class="wc-head">
+        <div class="wc-ic" style="background:${l.color}1f"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">${l.icon}</svg></div>
+        <div><h3>${l.title}</h3></div>
+      </div>
+      <div class="wc-sub">${nowN>0?`${nowN} roda${nowN>1?'m':''} já · `:''}${l.opts.length} conector${l.opts.length>1?'es':''} codado${l.opts.length>1?'s':''}</div>
+      ${opts}
+      <div class="wc-hint">${l.hint}</div>
+    </div>`;
+  }).join('');
+}
+window.addEventListener('DOMContentLoaded', renderWelcomeGrid);
+const PAGES = {
+  dashboard:{t:'Dashboard', s:'Visão geral da sua landing zone Atlas', r:renderDashboard},
+  catalog:{t:'Catálogo de templates', s:'Ambientes Atlas pré-aprovados e well-architected', r:renderCatalog},
+  request:{t:'Solicitar cluster', s:'Acesso self-service governado ao MongoDB Atlas', r:renderRequest},
+  copilot:{t:'Maestro Copilot', s:'Assistente de sizing e estimativa de custo', r:renderCopilot},
+  pipeline:{t:'Provisionamento', s:'Pipeline IaC — Terraform + Azure DevOps', r:renderPipeline},
+  observability:{t:'Observabilidade', s:'Saúde dos clusters (Grafana · Prometheus · Datadog)', r:renderObservability},
+  agents:{t:'Ops Copilot · Agentes de IA', s:'Operação Day-2 com MongoDB MCP Server + Agent Skills', r:renderAgents},
+  memory:{t:'Memória do agente', s:'Memória de curto e longo prazo em MongoDB — editável e auditável', r:renderMemory, after:afterMemory},
+  finops:{t:'FinOps', s:'Visibilidade financeira e chargeback por time', r:renderFinops},
+  guardrails:{t:'Guardrails & Segurança', s:'Políticas codificadas nos templates', r:renderGuardrails},
+  kb:{t:'Base de conhecimento', s:'Decision trees, sizing e FAQ (Confluence · SharePoint)', r:renderKB},
+};
+let charts=[];
+function destroyCharts(){ charts.forEach(c=>{try{c.destroy()}catch(e){}}); charts=[]; if(window._obTimer)clearInterval(window._obTimer); }
+function nav(screen){
+  destroyCharts();
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.screen===screen));
+  const p = PAGES[screen];
+  document.getElementById('pageTitle').textContent = p.t;
+  document.getElementById('pageSub').textContent = p.s;
+  document.getElementById('view').innerHTML = p.r();
+  if(p.after) p.after();
+  document.querySelector('.main').scrollTop=0;
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#2dd4bf" stroke-width="1.8"/><path d="M8 12l2.5 2.5L16 9" stroke="#2dd4bf" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>'+msg;
+  t.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('show'),3200);
+}
+function openModal(html){ document.getElementById('modal').innerHTML=html; document.getElementById('modalBg').style.display='flex'; }
+function closeModal(){ document.getElementById('modalBg').style.display='none'; }
+function envTag(e){const m={prod:'t-prod',stage:'t-stage',dev:'t-dev',test:'t-test'};return `<span class="tag ${m[e]||'t-dev'}">${e}</span>`;}
+
+/* =====================================================================
+   1) DASHBOARD
+   ===================================================================== */
+function renderDashboard(){
+  const fleet = MOCK.clusters.reduce((a,c)=>a+estimateCost({tier:c.tier,region:c.region,storageGB:0,nodes:1}).total,0);
+  const rows = MOCK.clusters.map(c=>`
+    <tr>
+      <td><b>${c.name}</b><div class="small muted">${c.team}</div></td>
+      <td>${envTag(c.env)}</td>
+      <td class="mono">${c.tier}</td>
+      <td class="mono">${REGIONS[c.region]?.label.split(' ')[0]||c.region}</td>
+      <td>${c.conns.toLocaleString('pt-BR')}</td>
+      <td><span class="dot" style="background:${c.cpu>65?'#fbbf24':'#34d399'}"></span> ${c.cpu}%</td>
+      <td><span class="tag t-ok"><span class="dot" style="background:#34d399"></span>online</span></td>
+    </tr>`).join('');
+  const reqRows = MOCK.requests.map(r=>{
+    const st={provisioned:['t-ok','provisionado'],awaiting:['t-wait','aguardando budget'],denied:['t-prod','negado']}[r.status];
+    return `<tr><td class="mono">${r.id}</td><td>${r.who}</td><td><b>${r.cluster}</b></td><td class="mono">${r.tier}</td><td>${envTag(r.env)}</td><td><span class="tag ${st[0]}">${st[1]}</span></td><td class="muted small">${r.when}</td></tr>`;
+  }).join('');
+
+  return `
+  <div class="banner mt" style="margin-top:0">
+    <div class="ic-box" style="background:var(--accent-soft)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke="#6d6af5" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </div>
+    <div>Sua landing zone está ativa. Devs solicitam clusters Atlas pré-aprovados em <b>minutos</b>, com guardrails de segurança e budget aplicados automaticamente. <b>Tempo médio de provisionamento: 6 min</b> (antes: ~3 semanas).</div>
+  </div>
+
+  <div class="grid cols-4 mt2">
+    <div class="card kpi"><div class="label"><span class="ic-box" style="background:#16203c"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#6d6af5" stroke-width="1.7"/></svg></span>Clusters ativos</div><div class="val">${MOCK.clusters.length}</div><div class="delta up">▲ 2 este mês</div></div>
+    <div class="card kpi"><div class="label"><span class="ic-box" style="background:#0c2220"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="#2dd4bf" stroke-width="1.7"/><path d="M3 20a6 6 0 0112 0" stroke="#2dd4bf" stroke-width="1.7"/></svg></span>Devs onboarded</div><div class="val">1.284</div><div class="delta up">▲ 96 esta semana</div></div>
+    <div class="card kpi"><div class="label"><span class="ic-box" style="background:#251d0b"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f0b860" stroke-width="1.7"/><path d="M12 7v10" stroke="#f0b860" stroke-width="1.6"/></svg></span>Custo mensal (fleet)</div><div class="val">${fmtUsd(fleet)}</div><div class="delta down">▲ 4% vs mês ant.</div></div>
+    <div class="card kpi"><div class="label"><span class="ic-box" style="background:#0d2417"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 16l5-6 4 4 5-7 4 5" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Economia identificada</div><div class="val">27%</div><div class="delta up">▼ over-provisioning</div></div>
+  </div>
+
+  <div class="sectiontitle">Fleet de clusters</div>
+  <div class="card" style="padding:6px 6px 0">
+    <table><thead><tr><th>Cluster</th><th>Ambiente</th><th>Tier</th><th>Região</th><th>Conexões</th><th>CPU</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
+  </div>
+
+  <div class="sectiontitle">Solicitações recentes</div>
+  <div class="card" style="padding:6px 6px 0">
+    <table><thead><tr><th>ID</th><th>Solicitante</th><th>Cluster</th><th>Tier</th><th>Amb.</th><th>Status</th><th>Quando</th></tr></thead><tbody>${reqRows}</tbody></table>
+  </div>
+
+  <div class="grid cols-2 mt2">
+    <div class="card flex" style="justify-content:space-between">
+      <div><h3>Precisa de um novo ambiente?</h3><div class="desc" style="margin:6px 0 0">Solicite um cluster a partir de um template aprovado.</div></div>
+      <button class="btn" onclick="nav('request')">Solicitar cluster</button>
+    </div>
+    <div class="card flex" style="justify-content:space-between">
+      <div><h3>Não sabe o tamanho ideal?</h3><div class="desc" style="margin:6px 0 0">O Maestro Copilot recomenda o tier e estima o custo.</div></div>
+      <button class="btn ghost" onclick="nav('copilot')">Abrir Copilot</button>
+    </div>
+  </div>`;
+}
+
+/* =====================================================================
+   2) CATÁLOGO DE TEMPLATES
+   ===================================================================== */
+function renderCatalog(){
+  const cards = TEMPLATES.map(t=>`
+    <div class="tpl" onclick="startFromTemplate('${t.id}')">
+      <div class="tname">${t.icon} ${t.name}</div>
+      <div class="tspec">Base: <b class="mono">${t.tier}</b> · ${t.env}<br/>${t.spec}</div>
+      <div class="chips">${t.chips.map(c=>`<span class="chip">✓ ${c}</span>`).join('')}</div>
+    </div>`).join('');
+  return `
+  <div class="banner" style="margin-bottom:8px">
+    <div>Templates <b>well-architected</b> e pré-aprovados pelo time de plataforma. Segurança, backup e networking já vêm codificados — o dev só escolhe e pede.</div>
+  </div>
+  <div class="grid cols-3 mt2">${cards}</div>`;
+}
+function startFromTemplate(id){
+  STATE.template=id;
+  const t=TEMPLATES.find(x=>x.id===id);
+  STATE.tier=t.tier;
+  nav('request');
+  toast('Template "'+t.name+'" carregado no formulário');
+}
+
+/* =====================================================================
+   3) SOLICITAR CLUSTER (formulário + aprovação de budget)
+   ===================================================================== */
+const STATE={template:'web-std', tier:'M30'};
+function renderRequest(){
+  const t=TEMPLATES.find(x=>x.id===STATE.template)||TEMPLATES[0];
+  const tierOpts=TIERS.map(x=>`<option value="${x.name}" ${x.name===STATE.tier?'selected':''}>${x.name} — ${x.ram}GB RAM / ${x.vcpu} vCPU / ${x.storage}GB</option>`).join('');
+  const regOpts=Object.entries(REGIONS).map(([k,v])=>`<option value="${k}" ${k==='sa-east-1'?'selected':''}>${v.label}</option>`).join('');
+  return `
+  <div class="grid cols-2" style="grid-template-columns:1.3fr 1fr">
+    <div class="card">
+      <h3>Detalhes da solicitação</h3>
+      <div class="desc">Template selecionado: <b>${t.icon} ${t.name}</b> · <a onclick="nav('catalog')">trocar</a></div>
+
+      <div class="field-row">
+        <div><label class="fl">Nome do cluster</label><input class="fi" id="f_name" placeholder="ex: orders-service-prod" value="orders-service"/></div>
+        <div><label class="fl">Time / Centro de custo</label><input class="fi" id="f_team" value="Pagamentos"/></div>
+      </div>
+      <div class="field-row">
+        <div><label class="fl">Ambiente</label><select class="fi" id="f_env" onchange="recalc()"><option value="dev">dev</option><option value="test">test</option><option value="stage">stage</option><option value="prod" selected>prod</option></select></div>
+        <div><label class="fl">Cloud provider</label><select class="fi" id="f_cloud"><option>AWS</option><option>Azure</option><option>GCP</option></select></div>
+      </div>
+      <div class="field-row">
+        <div><label class="fl">Região</label><select class="fi" id="f_region" onchange="recalc()">${regOpts}</select></div>
+        <div><label class="fl">Tier do cluster</label><select class="fi" id="f_tier" onchange="recalc()">${tierOpts}</select></div>
+      </div>
+      <div class="field-row">
+        <div><label class="fl">Storage provisionado (GB)</label><input class="fi" id="f_storage" type="number" value="80" oninput="recalc()"/></div>
+        <div><label class="fl">Classificação do dado</label><select class="fi" id="f_class"><option>Interno</option><option selected>Confidencial</option><option>Restrito (PII/PCI)</option></select></div>
+      </div>
+      <label class="fl">Política de backup</label>
+      <select class="fi" id="f_backup"><option selected>Contínuo (PITR) — retenção 7 dias</option><option>Snapshot diário — 30 dias</option><option>Snapshot semanal — 90 dias</option></select>
+
+      <div class="flex mt2" style="gap:18px;flex-wrap:wrap">
+        <label class="flex small"><input type="checkbox" checked/> &nbsp;Private Endpoint (VPC Peering)</label>
+        <label class="flex small"><input type="checkbox" checked/> &nbsp;Encryption at-rest (BYOK)</label>
+        <label class="flex small"><input type="checkbox" checked/> &nbsp;Audit log → SIEM</label>
+        <label class="flex small"><input type="checkbox" checked/> &nbsp;Integração observabilidade (Grafana)</label>
+      </div>
+
+      <div class="mt2 flex">
+        <button class="btn" onclick="submitRequest()">Solicitar provisionamento</button>
+        <button class="btn ghost" onclick="nav('copilot')">Não sei o tamanho — usar Copilot</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" id="costCard"></div>
+      <div class="card mt" style="margin-top:16px">
+        <h3>Fluxo de aprovação</h3>
+        <div class="pipe mt" style="margin-top:12px">
+          <div class="pstep done"><div class="marker">1</div><div class="line"></div><div><div class="ptitle">Autenticação AD</div><div class="pdesc">SSO federado validado · grupo <span class="mono">platform-engineers</span></div></div></div>
+          <div class="pstep done"><div class="marker">2</div><div class="line"></div><div><div class="ptitle">Guardrails de segurança</div><div class="pdesc">Template aprovado para a classificação do dado</div></div></div>
+          <div class="pstep active"><div class="marker">$</div><div class="line"></div><div><div class="ptitle">Aprovação de budget</div><div class="pdesc">Avaliada contra o orçamento do time ao submeter</div></div></div>
+          <div class="pstep"><div class="marker">4</div><div class="line"></div><div><div class="ptitle">Provisionamento IaC</div><div class="pdesc">Terraform + Azure DevOps</div></div></div>
+          <div class="pstep"><div class="marker">✓</div><div><div class="ptitle">Acesso liberado</div><div class="pdesc">Connection string + observabilidade</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+PAGES.request.after=recalc;
+function recalc(){
+  const tier=val('f_tier'), region=val('f_region'), storage=+val('f_storage')||80, env=val('f_env');
+  const c=estimateCost({tier,region,storageGB:storage,nodes:1});
+  const budget = {dev:2000,test:2000,stage:6000,prod:30000}[env];
+  const over = c.total>budget;
+  const card=document.getElementById('costCard'); if(!card)return;
+  card.innerHTML=`
+    <h3>Estimativa de custo mensal</h3>
+    <div class="desc">${c.tier.name} · ${c.region.label} · ${c.storageGB}GB</div>
+    <div class="costline"><span>Compute (730h × ${c.region.mult}×)</span><b>${fmtUsd2(c.compute)}</b></div>
+    <div class="costline"><span>Storage adicional</span><b>${fmtUsd2(c.storage)}</b></div>
+    <div class="costline"><span>Backup</span><b>${fmtUsd2(c.backup)}</b></div>
+    <div class="costline"><span>Tráfego de rede (+10%)</span><b>${fmtUsd2(c.network)}</b></div>
+    <div class="costline"><span>Total / mês</span><b>${fmtUsd2(c.total)}</b></div>
+    <div class="small muted mt" style="margin-top:10px">≈ ${fmtBrl(c.totalBrl)} /mês · ${fmtUsd2(c.total*12)} /ano</div>
+    <div class="mt" style="margin-top:14px">
+      <div class="spread small"><span class="muted">Budget ${env}: ${fmtUsd(budget)}/mês</span><span style="color:${over?'#f87171':'#34d399'}">${over?'⚠ acima do budget':'✓ dentro do budget'}</span></div>
+      <div class="bar mt" style="margin-top:6px"><i style="width:${Math.min(100,c.total/budget*100)}%;background:${over?'linear-gradient(90deg,#f87171,#fbbf24)':'linear-gradient(90deg,#6d6af5,#2dd4bf)'}"></i></div>
+    </div>`;
+}
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
+function submitRequest(){
+  const name=val('f_name'), env=val('f_env'), tier=val('f_tier'), region=val('f_region'), storage=+val('f_storage')||80;
+  const c=estimateCost({tier,region,storageGB:storage,nodes:1});
+  const budget={dev:2000,test:2000,stage:6000,prod:30000}[env];
+  const over=c.total>budget;
+  if(over){
+    openModal(`
+      <div class="modal-h"><div class="ic-box" style="background:#3a1320"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3l9-16z" stroke="#f87171" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke="#f87171" stroke-width="1.8" stroke-linecap="round"/></svg></div><b>Aprovação de budget necessária</b><span class="x" onclick="closeModal()">×</span></div>
+      <div class="modal-b">
+        <p>A estimativa de <b>${fmtUsd2(c.total)}/mês</b> para <b>${name}-${env}</b> excede o orçamento mensal do ambiente <b>${env}</b> (${fmtUsd(budget)}).</p>
+        <p>Conforme o fluxo da landing zone, a solicitação será <b>encaminhada ao aprovador financeiro do time</b>. Um e-mail foi disparado para <span class="mono">finops@contoso.com</span> e ao gestor do centro de custo.</p>
+        <h4>O que acontece agora</h4>
+        <ul><li>Aprovado → o pipeline de provisionamento inicia automaticamente.</li><li>Negado → o solicitante recebe e-mail com a justificativa e alternativas de sizing.</li></ul>
+        <div class="flex mt2"><button class="btn" onclick="closeModal();toast('Solicitação enviada para aprovação de budget')">Enviar para aprovação</button><button class="btn ghost" onclick="closeModal();nav('copilot')">Otimizar com o Copilot</button></div>
+      </div>`);
+  } else {
+    PIPE_CTX={name:name+'-'+env, tier, region, env};
+    nav('pipeline');
+    setTimeout(runPipeline,400);
+  }
+}
+
+/* =====================================================================
+   4) MAESTRO COPILOT  (sizing + custo)
+   ===================================================================== */
+let CHAT=[];
+function renderCopilot(){
+  CHAT=[{role:'bot',html:`Olá! Sou o <b>Maestro Copilot</b> 🎼<br/>Me descreva o seu workload e eu recomendo o <b>tier do Atlas</b> e estimo o <b>custo mensal</b> (já considerando backup e +10% de tráfego de rede).<br/><br/>Exemplo: <i>"app de pedidos com 400GB de dados, working set de 50GB, 3000 ops/s e pico de 5000 conexões em produção em São Paulo"</i>.`}];
+  return `
+  <div class="tabs">
+    <span class="tab active" id="tabBtnChat" onclick="copilotTab('chat')">Conversar</span>
+    <span class="tab" id="tabBtnJson" onclick="copilotTab('json')">Analisar documento JSON</span>
+  </div>
+
+  <div id="tabChat">
+  <div class="chat-wrap">
+    <div class="card chat">
+      <div class="chat-log" id="chatLog"></div>
+      <div class="quick">
+        <span onclick="quickAsk(this)">App de pedidos: 400GB, working set 50GB, 3000 ops/s, 5000 conexões, prod em São Paulo</span>
+        <span onclick="quickAsk(this)">Chatbot RAG com Vector Search, 80GB de dados, 800 ops/s, dev</span>
+        <span onclick="quickAsk(this)">Data lake analítico 2TB, working set 200GB, 1500 ops/s, stage</span>
+      </div>
+      <div class="chat-input">
+        <input class="fi" id="chatInput" placeholder="Descreva o workload..." onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="btn" onclick="sendChat()">Enviar</button>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>Como o sizing funciona</h3>
+        <div class="desc" style="margin-top:8px">O Copilot aplica as heurísticas do Atlas Architecture Center:</div>
+        <ul class="small muted" style="padding-left:16px;line-height:1.9;margin:0">
+          <li><b>Working set em RAM</b> — dado quente deve caber na memória do tier.</li>
+          <li><b>Storage</b> = dados × 1,25 (folga de crescimento).</li>
+          <li><b>Conexões</b> e <b>throughput</b> limitam o tier mínimo.</li>
+          <li>Custo = compute + storage + backup + <b>10% rede</b>.</li>
+        </ul>
+        <div class="banner small mt2" style="margin-top:16px">No protótipo as respostas são geradas localmente. Para respostas ao vivo, basta plugar a API de LLM (Claude ou OpenAI) em <span class="mono">Providers.llm</span>.</div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="tabJson" style="display:none">
+  <div class="chat-wrap">
+    <div class="card">
+      <h3>Análise de documento JSON</h3>
+      <div class="desc">Suba um documento JSON representativo. O Maestro estima o <b>tamanho médio</b>, projeta o <b>volume de dados</b> e o <b>working set</b>, recomenda o tier — e a IA aponta <b>anti-patterns de modelagem</b>.</div>
+      <div class="drop" id="drop" onclick="document.getElementById('jsonFile').click()"
+        ondragover="event.preventDefault();this.classList.add('over')"
+        ondragleave="this.classList.remove('over')"
+        ondrop="handleDrop(event)">
+        <input type="file" id="jsonFile" accept=".json,application/json" style="display:none" onchange="handleJsonFile(event)"/>
+        <div style="font-size:22px">📄</div>
+        <div style="margin-top:6px;font-weight:600">Clique para enviar um <span class="mono">.json</span> ou arraste aqui</div>
+        <div class="small muted" style="margin-top:4px">ou cole o conteúdo no campo abaixo</div>
+      </div>
+      <textarea class="fi" id="jsonText" rows="9" style="margin-top:12px;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:12px" placeholder='{"_id": "order_123", "items": [ ... ] }'></textarea>
+      <div class="field-row" style="margin-top:12px">
+        <div><label class="fl">Nº estimado de documentos na coleção</label><input class="fi" id="jsonCount" type="number" value="10000000"/></div>
+        <div><label class="fl">Região</label><select class="fi" id="jsonRegion">${Object.entries(REGIONS).map(([k,v])=>`<option value="${k}" ${k==='sa-east-1'?'selected':''}>${v.label}</option>`).join('')}</select></div>
+      </div>
+      <div class="flex mt2"><button class="btn" onclick="runJsonAnalysis()">✨ Analisar com IA</button><button class="btn ghost" onclick="loadJsonExample()">Carregar exemplo</button></div>
+    </div>
+    <div><div class="card" id="jsonResult"><div class="muted small">O resultado da análise (estimativa + anti-patterns) aparece aqui.</div></div></div>
+  </div>
+  </div>`;
+}
+PAGES.copilot.after=()=>drawChat();
+function copilotTab(t){
+  document.getElementById('tabChat').style.display = t==='chat'?'':'none';
+  document.getElementById('tabJson').style.display = t==='json'?'':'none';
+  document.getElementById('tabBtnChat').classList.toggle('active',t==='chat');
+  document.getElementById('tabBtnJson').classList.toggle('active',t==='json');
+}
+function handleJsonFile(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=e=>{document.getElementById('jsonText').value=e.target.result; runJsonAnalysis();}; r.readAsText(f);
+}
+function handleDrop(ev){
+  ev.preventDefault(); ev.currentTarget.classList.remove('over');
+  const f=ev.dataTransfer.files[0]; if(!f)return;
+  const r=new FileReader(); r.onload=e=>{document.getElementById('jsonText').value=e.target.result; runJsonAnalysis();}; r.readAsText(f);
+}
+function loadJsonExample(){
+  document.getElementById('jsonText').value = JSON.stringify(JSON_EXAMPLE,null,2);
+  runJsonAnalysis();
+}
+const JSON_EXAMPLE = {
+  _id:"order_88213", customer_id:"cust_4521", status:"shipped", total:349.9,
+  "shipping.address":{ street:"Av. Paulista 1000", city:"São Paulo", zip:"01310-100" },
+  items:[ {sku:"A1",qty:2,price:49.9}, {sku:"B2",qty:1,price:250.1} ],
+  audit_events: Array.from({length:420},(_,i)=>({ts:"2026-05-0"+(i%9+1),action:"update",by:"system",note:"auto-generated event entry "+i})),
+  invoice_pdf_base64:"JVBERi0xLjQKJeLjz9MKM"+"A".repeat(900)+"==",
+  meta:{a:{b:{c:{d:{e:{f:{deep:"valor muito aninhado"}}}}}}}
+};
+/* analisador de schema — no protótipo roda local; Providers.claude.analyzeSchema
+   pode substituir por análise semântica do Claude (relações, embedding vs ref). */
+function analyzeSchema(obj){
+  const issues=[]; let maxDepth=0, fieldCount=0, maxArray=0;
+  const sizeBytes = new Blob([JSON.stringify(obj)]).size;
+  function walk(v,depth,path){
+    maxDepth=Math.max(maxDepth,depth);
+    if(Array.isArray(v)){
+      maxArray=Math.max(maxArray,v.length);
+      if(v.length>100) issues.push({lvl:'high',t:'Array potencialmente unbounded',d:`O campo "${path}" tem ${v.length} elementos. Arrays que crescem sem limite incham o documento (limite de 16MB) e degradam updates/índices. Considere o padrão de referências ou bucketing.`});
+      v.slice(0,40).forEach(e=>walk(e,depth+1,path+'[]'));
+    } else if(v && typeof v==='object'){
+      const keys=Object.keys(v); fieldCount+=keys.length;
+      if(keys.length>60) issues.push({lvl:'medium',t:'Documento com muitos campos',d:`"${path||'root'}" tem ${keys.length} campos — aumenta o working set e o I/O por leitura.`});
+      keys.forEach(k=>{
+        if(k.startsWith('$')||k.includes('.')) issues.push({lvl:'high',t:'Nome de campo inválido/arriscado',d:`Campo "${k}" usa "$" ou ".", o que quebra queries, projeções e drivers. Renomeie (ex: "shipping_address").`});
+        walk(v[k],depth+1,path?path+'.'+k:k);
+      });
+    } else if(typeof v==='string'){
+      if(/^[A-Za-z0-9+/]{300,}={0,2}$/.test(v.replace(/\s/g,''))) issues.push({lvl:'medium',t:'Blob/base64 dentro do documento',d:`"${path}" parece um binário/base64 grande (~${(v.length/1024).toFixed(0)} KB). Guarde binários em object storage (S3) e mantenha só a referência no documento.`});
+      else if(v.length>50000) issues.push({lvl:'low',t:'String muito longa',d:`"${path}" tem ~${(v.length/1024).toFixed(0)} KB; avalie mover para fora do documento.`});
+    }
+  }
+  walk(obj,1,'');
+  if(maxDepth>6) issues.push({lvl:'medium',t:'Aninhamento profundo',d:`Profundidade de ${maxDepth} níveis. Documentos muito aninhados dificultam indexar e atualizar campos internos.`});
+  if(sizeBytes>1000000) issues.push({lvl:'high',t:'Documento muito grande',d:`~${(sizeBytes/1e6).toFixed(2)} MB. Está caminhando para o limite de 16MB; reveja embedding vs. referência.`});
+  return {sizeBytes,maxDepth,fieldCount,maxArray,issues};
+}
+function runJsonAnalysis(){
+  const box=document.getElementById('jsonResult');
+  let obj; const raw=document.getElementById('jsonText').value.trim();
+  if(!raw){box.innerHTML='<div class="muted small">Cole ou suba um JSON primeiro.</div>';return;}
+  try{ obj=JSON.parse(raw); }catch(e){ box.innerHTML='<div class="issue high"><div class="sev"></div><div><div class="it">JSON inválido</div><div class="id">'+escapeHtml(e.message)+'</div></div></div>'; return; }
+  const a=analyzeSchema(obj);
+  const count=Math.max(1,+document.getElementById('jsonCount').value||1);
+  const region=document.getElementById('jsonRegion').value;
+  // documento de amostra pode ser um array; usa tamanho médio por elemento
+  const isArr=Array.isArray(obj);
+  const avgBytes = isArr && obj.length ? a.sizeBytes/obj.length : a.sizeBytes;
+  const dataGB = avgBytes*count/1e9;
+  const workingSetGB = Math.max(0.5, dataGB*0.10);   // ~10% quente + índices (heurística)
+  const rec=recommendTier({dataGB,workingSetGB,opsSec:0,conns:0});
+  const cost=estimateCost({tier:rec.tier.name,region,storageGB:Math.ceil(dataGB*1.25),nodes:1});
+  const sev={high:'high',medium:'medium',low:'low'};
+  const issuesHtml = a.issues.length ? a.issues.map(i=>`
+    <div class="issue ${sev[i.lvl]}"><div class="sev"></div><div>
+      <div class="it">${i.t} <span class="sevtag ${sev[i.lvl]}">${i.lvl==='high'?'alto':i.lvl==='medium'?'médio':'baixo'}</span></div>
+      <div class="id">${i.d}</div></div></div>`).join('')
+    : '<div class="ok-card">✓ Nenhum anti-pattern crítico detectado neste documento. Boa modelagem!</div>';
+  box.innerHTML=`
+    <h3>Resultado da análise</h3>
+    <div class="costline"><span>Tamanho médio do documento</span><b>${(avgBytes/1024).toFixed(1)} KB</b></div>
+    <div class="costline"><span>Documentos estimados</span><b>${count.toLocaleString('pt-BR')}</b></div>
+    <div class="costline"><span>Volume de dados projetado</span><b>${dataGB<1?(dataGB*1024).toFixed(0)+' MB':dataGB.toFixed(1)+' GB'}</b></div>
+    <div class="costline"><span>Working set estimado (~10%)</span><b>${(workingSetGB).toFixed(1)} GB</b></div>
+    <div class="costline"><span>Tier recomendado</span><b>${rec.tier.name} · ${rec.tier.ram}GB RAM</b></div>
+    <div class="costline"><span>Custo estimado / mês</span><b>${fmtUsd2(cost.total)} · ${fmtBrl(cost.totalBrl)}</b></div>
+    <div class="sectiontitle" style="margin:18px 0 12px">Anti-patterns de modelagem (análise IA)</div>
+    ${issuesHtml}
+    <div class="flex mt2"><button class="btn sm" onclick="STATE.tier='${rec.tier.name}';nav('request');toast('Tier ${rec.tier.name} aplicado no formulário')">Usar ${rec.tier.name} no formulário →</button></div>
+    <div class="small muted mt" style="margin-top:10px">Estimativa baseada no tamanho JSON (BSON real pode variar). Análise de anti-patterns no protótipo é heurística local; em produção, o LLM (Claude ou OpenAI) faz a leitura semântica.</div>`;
+}
+function drawChat(){
+  const log=document.getElementById('chatLog'); if(!log)return;
+  log.innerHTML=CHAT.map(m=>`
+    <div class="msg ${m.role==='bot'?'bot':'me'}">
+      <div class="av">${m.role==='bot'?'🎼':'CB'}</div>
+      <div class="bubble">${m.html}</div>
+    </div>`).join('');
+  log.scrollTop=log.scrollHeight;
+}
+function quickAsk(el){ document.getElementById('chatInput').value=el.textContent; sendChat(); }
+async function sendChat(){
+  const inp=document.getElementById('chatInput'); const txt=inp.value.trim(); if(!txt)return;
+  CHAT.push({role:'me',html:escapeHtml(txt)}); inp.value=''; drawChat();
+  CHAT.push({role:'bot',html:'<span class="muted">analisando o workload…</span>'}); drawChat();
+  const reply=await Providers.claude.sizing(txt,CHAT);
+  CHAT.pop(); CHAT.push({role:'bot',html:reply.html}); drawChat();
+}
+function escapeHtml(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function parseNum(re,txt){const m=txt.match(re);if(!m)return 0;let n=parseFloat(m[1].replace(',','.'));if(/tb|tera/i.test(m[0]))n*=1024;return n;}
+function mockSizingReply(txt){
+  const t=txt.toLowerCase();
+  const dataGB=parseNum(/(\d+[.,]?\d*)\s*(gb|tb|tera)\b.*?(dados|data|volume)?/i,t) || parseNum(/(\d+[.,]?\d*)\s*(tb|gb)/i,t);
+  const workingSetGB=parseNum(/working\s*set\s*(?:de)?\s*(\d+[.,]?\d*)\s*(gb|tb)/i,t);
+  const opsSec=parseNum(/(\d+[.,]?\d*)\s*(?:k)?\s*ops/i,t) || parseNum(/(\d+[.,]?\d*)\s*(?:k)?\s*op\/s/i,t);
+  const conns=parseNum(/(\d+[.,]?\d*)\s*(?:k)?\s*(?:conex|connection)/i,t);
+  let env='prod'; if(/\bdev\b/.test(t))env='dev'; else if(/stage|homolog/.test(t))env='stage'; else if(/test/.test(t))env='test';
+  let region='sa-east-1'; if(/virginia|us-east/.test(t))region='us-east-1'; else if(/irlanda|eu-west/.test(t))region='eu-west-1'; else if(/frankfurt/.test(t))region='eu-central-1';
+  const genai=/vector|rag|genai|embedding|ia gen|llm/.test(t);
+
+  if(!dataGB && !opsSec && !conns){
+    return {html:`Pra te dar um número confiável, me diz pelo menos: <b>volume de dados</b> (GB/TB), e se possível <b>ops/s</b> e <b>pico de conexões</b>. Ex: <i>"500GB, 2000 ops/s, 4000 conexões em prod"</i>.`};
+  }
+  const rec=recommendTier({dataGB,workingSetGB,opsSec,conns});
+  const cost=estimateCost({tier:rec.tier.name,region,storageGB:Math.ceil(dataGB*1.25),nodes:1});
+  const reasons=rec.reasons.map(r=>`<li>${r}</li>`).join('');
+  return {html:`
+    Com base no que você descreveu, recomendo o tier <b>${rec.tier.name}</b>${genai?' com <b>Vector Search</b> habilitado':''}.
+    <div class="rec">
+      <div class="spread"><b>${rec.tier.name}</b><span class="muted small">${rec.tier.ram}GB RAM · ${rec.tier.vcpu} vCPU · até ${rec.tier.conns.toLocaleString('pt-BR')} conexões</span></div>
+      <ul class="small muted" style="padding-left:16px;line-height:1.8;margin:10px 0 4px">${reasons}</ul>
+    </div>
+    <div class="rec">
+      <div class="small muted" style="margin-bottom:6px">Estimativa de custo — ${REGIONS[region].label} · ${env}</div>
+      <div class="costline"><span>Compute</span><b>${fmtUsd2(cost.compute)}</b></div>
+      <div class="costline"><span>Storage (${cost.storageGB}GB)</span><b>${fmtUsd2(cost.storage)}</b></div>
+      <div class="costline"><span>Backup</span><b>${fmtUsd2(cost.backup)}</b></div>
+      <div class="costline"><span>Rede (+10%)</span><b>${fmtUsd2(cost.network)}</b></div>
+      <div class="costline"><span>Total / mês</span><b>${fmtUsd2(cost.total)} · ${fmtBrl(cost.totalBrl)}</b></div>
+    </div>
+    <div class="mt" style="margin-top:12px"><button class="btn sm" onclick="STATE.tier='${rec.tier.name}';nav('request');toast('Tier ${rec.tier.name} aplicado no formulário')">Usar ${rec.tier.name} no formulário →</button></div>`};
+}
+
+/* =====================================================================
+   5) PIPELINE DE PROVISIONAMENTO
+   ===================================================================== */
+let PIPE_CTX={name:'orders-service-prod', tier:'M50', region:'sa-east-1', env:'prod'};
+const PIPE_STEPS=[
+  {t:'Validação & aprovação', d:'Budget aprovado · guardrails OK', log:'✓ AD group: platform-engineers\n✓ Data class: Confidencial → template OLTP-prod\n✓ Budget: dentro do limite do time'},
+  {t:'terraform plan', d:'Gerando plano de infraestrutura', log:'$ terraform plan -out=atlas.tfplan\n+ mongodbatlas_advanced_cluster.this\n+ mongodbatlas_project_ip_access_list.vpc\n+ mongodbatlas_cloud_backup_schedule.pitr\nPlan: 6 to add, 0 to change, 0 to destroy.'},
+  {t:'Azure DevOps pipeline', d:'Esteira de deploy disparada', log:'Pipeline #4821 ▸ stage: provision-atlas\nAgent: ubuntu-latest ▸ pool: cloud-db'},
+  {t:'terraform apply', d:'Criando recursos no Atlas', log:'$ terraform apply atlas.tfplan\nmongodbatlas_advanced_cluster.this: Creating...\nmongodbatlas_advanced_cluster.this: Creation complete (M50, sa-east-1)'},
+  {t:'Networking & segurança', d:'VPC Peering · BYOK · Audit', log:'✓ Private Endpoint criado (vpce-0a1b2c)\n✓ Encryption at-rest via KMS key\n✓ Audit log → SIEM (Splunk HEC)'},
+  {t:'Observabilidade', d:'Integração de métricas/alertas', log:'✓ Datasource Grafana conectado (Atlas API key)\n✓ Dashboard provisionado · alertas DBA ativos'},
+  {t:'Acesso liberado', d:'Connection string entregue ao dev', log:'✓ mongodb+srv://'+'<user>'+':<pwd>@'+'orders-service-prod.mongodb.net\n✓ Notificação enviada via ServiceNow'},
+];
+function renderPipeline(){
+  return `
+  <div class="banner" style="margin-bottom:8px">
+    <div>Provisionando <b>${PIPE_CTX.name}</b> — <span class="mono">${PIPE_CTX.tier}</span> · ${REGIONS[PIPE_CTX.region]?.label||PIPE_CTX.region}. Tudo automatizado por IaC — zero ticket manual.</div>
+    <div class="spacer" style="flex:1"></div>
+    <button class="btn sm" onclick="runPipeline()">▶ Reexecutar</button>
+  </div>
+  <div class="grid cols-2" style="grid-template-columns:1fr 1fr;align-items:start">
+    <div class="card"><h3>Esteira de provisionamento</h3><div class="pipe mt" id="pipe" style="margin-top:14px">${
+      PIPE_STEPS.map((s,i)=>`<div class="pstep" id="ps${i}"><div class="marker">${i+1}</div><div class="line"></div><div><div class="ptitle">${s.t}</div><div class="pdesc">${s.d}</div><div class="plog" id="pl${i}">${s.log}</div></div></div>`).join('')
+    }</div></div>
+    <div class="card"><h3>Log de execução</h3><div class="term mt" id="term" style="margin-top:12px"><span class="m">aguardando início…</span></div></div>
+  </div>`;
+}
+PAGES.pipeline.after=()=>setTimeout(runPipeline,300);
+async function runPipeline(){
+  const term=document.getElementById('term'); if(!term)return;
+  PIPE_STEPS.forEach((s,i)=>{const e=document.getElementById('ps'+i);if(e)e.className='pstep';});
+  term.innerHTML='';
+  for(let i=0;i<PIPE_STEPS.length;i++){
+    const e=document.getElementById('ps'+i); if(!e)return;
+    e.className='pstep active';
+    term.innerHTML+=`<div><span class="b">▸ ${PIPE_STEPS[i].t}</span></div>`;
+    await wait(750);
+    PIPE_STEPS[i].log.split('\n').forEach(l=>{
+      const cls=l.startsWith('✓')?'g':l.startsWith('+')?'g':l.startsWith('$')?'y':'';
+      term.innerHTML+=`<div class="${cls}">${escapeHtml(l)}</div>`;
+    });
+    term.scrollTop=term.scrollHeight;
+    await wait(550);
+    e.className='pstep done';
+  }
+  term.innerHTML+=`<div class="g" style="margin-top:8px">✓ Concluído em 6m12s — cluster pronto para uso.</div>`;
+  term.scrollTop=term.scrollHeight;
+  toast('Cluster '+PIPE_CTX.name+' provisionado com sucesso');
+}
+
+/* =====================================================================
+   6) OBSERVABILIDADE (Grafana mock)
+   ===================================================================== */
+function renderObservability(){
+  const opts=MOCK.clusters.map(c=>`<option>${c.name}</option>`).join('');
+  return `
+  <div class="flex" style="margin-bottom:6px">
+    <label class="fl" style="margin:0">Cluster</label>
+    <select class="fi" style="width:240px" onchange="toast('Métricas: '+this.value)">${opts}</select>
+    <div class="spacer" style="flex:1"></div>
+    <span class="env-tag">⟳ ao vivo · janela 15min</span>
+  </div>
+  <div class="flex small" style="margin-bottom:14px;gap:8px;flex-wrap:wrap">
+    <span class="muted">Backend de métricas:</span>
+    ${OBS_SOURCES.map(s=>`<span class="tag ${s.on?'t-ok':''}" style="${s.on?'':'opacity:.55'};cursor:pointer" onclick="toast('${s.name}: ${s.on?'conectado':'conecte no painel de integrações'}')"><span class="dot" style="background:${s.on?'#34d399':'#5b6480'}"></span> ${s.name}</span>`).join(' ')}
+  </div>
+  <div class="grid cols-4 mt">
+    ${obStat('CPU System','62%','#fbbf24')}
+    ${obStat('Memória residente','24.1 GB','#6d6af5')}
+    ${obStat('Conexões','8.4k','#2dd4bf')}
+    ${obStat('Replication lag','0.3s','#34d399')}
+  </div>
+  <div class="panel-grid mt2">
+    ${obPanel('CPU / Normalized System (%)','c_cpu')}
+    ${obPanel('Opcounters (q/i/u/d por s)','c_ops')}
+    ${obPanel('Conexões ativas','c_conn')}
+    ${obPanel('Disk IOPS (read/write)','c_iops')}
+  </div>`;
+}
+function obStat(n,v,c){return `<div class="card kpi"><div class="label">${n}</div><div class="val" style="color:${c}">${v}</div><div class="delta muted">últimos 15 min</div></div>`;}
+function obPanel(title,id){return `<div class="ob-panel"><div class="ph"><span class="nm">${title}</span><span class="cur" id="${id}_cur"></span></div><canvas id="${id}"></canvas></div>`;}
+PAGES.observability.after=initObservability;
+function initObservability(){
+  const labels=Array.from({length:30},(_,i)=>i);
+  const mk=(id,series,colors,opt={})=>{
+    const ctx=document.getElementById(id); if(!ctx)return;
+    const ch=new Chart(ctx,{type:'line',data:{labels,datasets:series.map((s,i)=>({data:s.data,borderColor:colors[i],backgroundColor:colors[i]+'22',borderWidth:2,fill:opt.fill!==false,tension:.4,pointRadius:0}))},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:series.length>1,labels:{color:'#8b97b3',boxWidth:10,font:{size:10}}}},
+        scales:{x:{display:false},y:{grid:{color:'#1b2335'},ticks:{color:'#67738f',font:{size:9}},beginAtZero:true,suggestedMax:opt.max}}}});
+    charts.push(ch); return ch;
+  };
+  const rnd=(base,amp)=>Array.from({length:30},()=>base+Math.random()*amp-amp/2);
+  const cpu=mk('c_cpu',[{data:rnd(60,20)}],['#fbbf24'],{max:100});
+  const ops=mk('c_ops',[{data:rnd(2600,800)},{data:rnd(900,300)}],['#6d6af5','#2dd4bf']);
+  const conn=mk('c_conn',[{data:rnd(8200,900)}],['#2dd4bf']);
+  const iops=mk('c_iops',[{data:rnd(1400,500)},{data:rnd(700,300)}],['#56a8ff','#f0b860']);
+  const setCur=(id,v,suf='')=>{const e=document.getElementById(id+'_cur');if(e)e.textContent=Math.round(v)+suf;};
+  const push=(ch,fn)=>{ch.data.datasets.forEach(d=>{d.data.shift();d.data.push(fn());});ch.update('none');};
+  window._obTimer=setInterval(()=>{
+    push(cpu,()=>Math.min(98,55+Math.random()*30)); setCur('c_cpu',cpu.data.datasets[0].data.at(-1),'%');
+    push(ops,()=>2400+Math.random()*900); setCur('c_ops',ops.data.datasets[0].data.at(-1));
+    push(conn,()=>8000+Math.random()*900); setCur('c_conn',conn.data.datasets[0].data.at(-1));
+    push(iops,()=>1200+Math.random()*600); setCur('c_iops',iops.data.datasets[0].data.at(-1));
+  },1500);
+  setCur('c_cpu',62,'%');setCur('c_ops',2600);setCur('c_conn',8400);setCur('c_iops',1400);
+}
+
+/* =====================================================================
+   6.5) OPS COPILOT — Agentes (MongoDB MCP Server + Agent Skills)
+   ===================================================================== */
+const MCP_TOOLS=[
+  'atlas-list-clusters','atlas-create-cluster','atlas-get-metrics',
+  'atlas-performance-advisor','find','aggregate','explain',
+  'collection-schema','create-index','db-stats'
+];
+const SKILLS=[
+  {n:'atlas-sizing', d:'Recomenda tier e custo a partir do workload'},
+  {n:'schema-anti-pattern-review', d:'Audita modelagem (arrays unbounded, doc grande, etc.)'},
+  {n:'atlas-incident-triage', d:'Correlaciona métricas + slow query e propõe causa raiz'},
+  {n:'index-advisor', d:'Sugere índices via Performance Advisor'},
+  {n:'finops-rightsizing', d:'Detecta over-provisioning e sugere ajuste'},
+  {n:'memory-curator', d:'Escreve/edita/expira fatos na memória de longo prazo (Atlas)'},
+];
+
+/* ---- Conectores plugáveis (adaptam o Maestro ao ambiente do cliente) ---- */
+const AUTH_SOURCES=[
+  {name:'Microsoft Entra ID / AD', on:true},
+  {name:'Okta', on:true},
+  {name:'AWS IAM', on:true},
+  {name:'Google Workspace', on:true},
+];
+const OBS_SOURCES=[
+  {name:'Grafana', on:true},
+  {name:'Prometheus', on:true},
+  {name:'Datadog', on:false},
+];
+const KB_SOURCES=[
+  {name:'Confluence', on:true},
+  {name:'SharePoint', on:true},
+];
+const CLOUD_SOURCES=[
+  {name:'AWS', on:true, detail:'VPC Peering · PrivateLink'},
+  {name:'GCP', on:true, detail:'VPC Peering · Private Service Connect'},
+  {name:'Azure', on:false, detail:'VNet Peering · Private Endpoint'},
+];
+
+/* =====================================================================
+   MEMÓRIA DO AGENTE  (curto + longo prazo · namespaces hierárquicos)
+   Inspirado nos componentes de um agente (percepção, ferramentas, memória)
+   e na interface do Claude (memória, instruções, arquivos): EDITÁVEL.
+   ===================================================================== */
+const MEM_NAMESPACE = {org:'contoso-atlas-prod', project:'payments', cluster:'fraud-ml-prod'};
+
+// Memória de LONGO prazo — fatos persistentes, recuperáveis por vector search, editáveis.
+let LTM = [
+  {id:'m1', scope:'cluster', text:'Índice { user_id: 1 } criado em 03/06 resolveu COLLSCAN na coleção transactions (p95 −65%).', kind:'decisão', src:'atlas-incident-triage', ts:'03/06 14:22', pinned:true},
+  {id:'m2', scope:'cluster', text:'Baseline de CPU em horário comercial: 55–65%. Picos acima de 85% por +5min são anômalos.', kind:'baseline', src:'observação contínua', ts:'28/05 09:10', pinned:false},
+  {id:'m3', scope:'project', text:'Janela de manutenção aprovada pelo time de Payments: domingos 02:00–04:00 (BRT).', kind:'política', src:'dev (manual)', ts:'20/05 16:40', pinned:true},
+  {id:'m4', scope:'cluster', text:'A coleção message_history cresce sem limite (~1.240 itens/doc) — refatoração de schema pendente (ticket JIRA PAY-812).', kind:'pendência', src:'schema-anti-pattern-review', ts:'01/06 11:05', pinned:false},
+  {id:'m5', scope:'org', text:'Política de FinOps: clusters com CPU média <15% por 30 dias são candidatos a downgrade automático (com aprovação).', kind:'política', src:'dev (manual)', ts:'10/05 08:00', pinned:false},
+  {id:'m6', scope:'cluster', text:'Restore de PITR testado com sucesso em 15/05 — RTO medido: 18 min.', kind:'fato', src:'atlas-ops', ts:'15/05 19:30', pinned:false},
+];
+// Memória de CURTO prazo — estado da sessão de triage atual (efêmero, checkpointer LangGraph).
+const STM = [
+  {step:'Research', note:'Alerta CPU>85% em fraud-ml-prod. Coletando métricas + performance advisor.'},
+  {step:'Plan', note:'1) explain na query quente · 2) checar índice em user_id · 3) propor create-index sob aprovação.'},
+  {step:'Implement', note:'COLLSCAN confirmado. Recuperado da LTM: índice análogo já resolveu caso similar (m1). Recomendar índice.'},
+];
+const SCOPE_META = {
+  org:{label:'Organização', color:'#f0b860', icon:'◈'},
+  project:{label:'Projeto', color:'#56a8ff', icon:'▣'},
+  cluster:{label:'Cluster', color:'#2dd4bf', icon:'⬡'},
+};
+function renderAgents(){
+  return `
+  <div class="banner" style="margin-bottom:8px">
+    <div class="ic-box" style="background:var(--accent-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="#6d6af5" stroke-width="1.6"/><path d="M5 20a7 7 0 0114 0" stroke="#6d6af5" stroke-width="1.6"/></svg></div>
+    <div>O <b>Ops Copilot</b> opera o Atlas em produção: o <b>MongoDB MCP Server</b> dá as ferramentas (as mãos), as <b>Agent Skills</b> são os playbooks (os manuais), o <b>LLM</b> (Claude ou OpenAI) raciocina (o cérebro) e a <b>Memória em MongoDB</b> dá continuidade (curto + longo prazo, editável). <b>Ações em produção exigem aprovação humana.</b></div>
+  </div>
+
+  <div class="chat-wrap">
+    <div>
+      <div class="sectiontitle" style="margin-top:8px">Feed de incidentes</div>
+      <div class="card agent-card" style="border-left:3px solid #f87171">
+        <div class="spread"><div class="flex"><span class="tag t-prod"><span class="dot" style="background:#f87171"></span> INCIDENTE</span> <b class="mono">fraud-ml-prod</b></div><span class="muted small">há 3 min</span></div>
+        <div class="mt" style="margin-top:10px"><b>Alerta do Grafana:</b> Normalized System CPU &gt; 85% por 8 min.</div>
+        <div class="plog" style="max-height:none;margin-top:10px">→ <span class="b">atlas-get-metrics</span>: CPU 91% · opcounters query +320% vs baseline
+→ <span class="b">explain</span> na query quente: <span class="y">COLLSCAN</span> em <span class="mono">transactions</span> (filtro por user_id)
+→ <span class="b">collection-schema</span>: índice ausente em <span class="mono">user_id</span></div>
+        <div class="rec" style="margin-top:10px"><b>Causa raiz:</b> query sem índice em <span class="mono">user_id</span> varrendo a coleção inteira. <span class="muted small">(skill: atlas-incident-triage)</span></div>
+        <div class="rec"><b>Ação recomendada:</b> criar índice <span class="mono">{ user_id: 1 }</span>. Impacto estimado: <span class="up">CPU −40% · p95 −65%</span>.</div>
+        <div class="agent-actions flex mt2">
+          <button class="btn sm" onclick="agentAct(this,'approve')">Aprovar e aplicar via MCP</button>
+          <button class="btn ghost sm" onclick="agentAct(this,'dismiss')">Dispensar</button>
+          <span class="muted small">ação em prod requer aprovação humana</span>
+        </div>
+      </div>
+
+      <div class="sectiontitle">Recomendações proativas</div>
+      ${recCard('Índice sugerido','catalog-search-stage','Performance Advisor aponta query frequente sem índice composto em <span class="mono">{ category:1, price:-1 }</span>.','index-advisor · atlas-performance-advisor','Criar índice composto')}
+      ${recCard('Right-sizing (FinOps)','catalog-search-stage','CPU média de 12% nos últimos 30 dias. Downgrade <span class="mono">M30 → M20</span> economiza <b class="up">~$248/mês</b>.','finops-rightsizing · atlas-get-metrics','Agendar downgrade')}
+      ${recCard('Schema anti-pattern','chat-rag-dev','Amostragem da coleção detectou array <span class="mono">message_history</span> crescendo sem limite (média 1.240 itens/doc).','schema-anti-pattern-review · collection-schema','Abrir ticket de refatoração')}
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>Ferramentas (MongoDB MCP Server)</h3>
+        <div class="small muted" style="margin:6px 0 12px">conectado · <span class="mono">npx mongodb-mcp-server</span></div>
+        ${MCP_TOOLS.map(t=>`<div class="flex small" style="padding:4px 0"><span class="dot" style="background:#34d399"></span> <span class="mono">${t}</span></div>`).join('')}
+      </div>
+      <div class="card mt" style="margin-top:16px">
+        <h3>Agent Skills</h3>
+        <div style="margin-top:8px">${SKILLS.map(s=>`<div style="padding:7px 0;border-bottom:1px solid #1b2335"><div class="small"><b>${s.n}</b></div><div class="small muted">${s.d}</div></div>`).join('')}</div>
+      </div>
+      <div class="card mt" style="margin-top:16px">
+        <h3>Nível de autonomia</h3>
+        <div style="margin-top:10px">
+          <label class="flex small" style="padding:5px 0"><input type="radio" name="auto" checked> &nbsp;Advisory (read-only)</label>
+          <label class="flex small" style="padding:5px 0"><input type="radio" name="auto" checked> &nbsp;Ação com aprovação humana</label>
+          <label class="flex small" style="padding:5px 0;opacity:.5"><input type="radio" name="auto" disabled> &nbsp;Autônomo em prod (desabilitado)</label>
+        </div>
+        <div class="small muted mt" style="margin-top:8px">Toda ação é registrada no SIEM com a credencial de menor privilégio do agente.</div>
+      </div>
+      <div class="card mt" style="margin-top:16px;cursor:pointer" onclick="nav('memory')">
+        <div class="spread"><h3>Memória</h3><span class="tag" style="background:linear-gradient(135deg,#f0b860,#2dd4bf);color:#0a0e1a">editável</span></div>
+        <div class="small muted" style="margin:6px 0 10px">Curto prazo (sessão) + longo prazo (Atlas)</div>
+        <div class="flex small" style="padding:3px 0"><span class="dot" style="background:#2dd4bf"></span> <span>${LTM.length} fatos de longo prazo · <span class="mono">vector search</span></span></div>
+        <div class="flex small" style="padding:3px 0"><span class="dot" style="background:#6d6af5"></span> <span>${STM.length} passos na sessão atual · <span class="mono">checkpointer</span></span></div>
+        <div class="small" style="margin-top:8px;color:var(--accent2)">Abrir memória do agente →</div>
+      </div>
+    </div>
+  </div>`;
+}
+function recCard(title,cluster,body,prov,action){
+  return `<div class="card agent-card" style="margin-bottom:14px">
+    <div class="spread"><b>${title}</b> <span class="mono small muted">${cluster}</span></div>
+    <div class="small" style="margin-top:8px;color:#c3cce0">${body}</div>
+    <div class="small muted" style="margin-top:6px">via ${prov}</div>
+    <div class="agent-actions flex mt2">
+      <button class="btn sm" onclick="agentAct(this,'approve')">${action}</button>
+      <button class="btn ghost sm" onclick="agentAct(this,'dismiss')">Dispensar</button>
+    </div></div>`;
+}
+function agentAct(el,action){
+  const foot=el.closest('.agent-actions');
+  if(action==='approve'){
+    foot.innerHTML='<span class="tag t-run"><span class="dot" style="background:#6d6af5"></span> executando via mongodb-mcp-server…</span>';
+    setTimeout(()=>{foot.innerHTML='<span class="tag t-ok"><span class="dot" style="background:#34d399"></span> aplicado · auditado no SIEM</span>';},1500);
+    toast('Ação aprovada — executando via MongoDB MCP Server');
+  } else {
+    foot.innerHTML='<span class="tag" style="background:#1b2335;color:#8b97b3">dispensado</span>';
+  }
+}
+
+/* =====================================================================
+   6b) MEMÓRIA DO AGENTE
+   ===================================================================== */
+let MEM_FILTER='all';
+function renderMemory(){
+  return `
+  <div class="banner" style="margin-bottom:14px">
+    <div class="ic-box" style="background:var(--accent-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="#6d6af5" stroke-width="1.6"/><path d="M9 4v16M4 9h5M4 15h5" stroke="#6d6af5" stroke-width="1.5"/></svg></div>
+    <div>A memória dá <b>continuidade</b> ao agente. Espelha os componentes de um agente (<b>percepção · ferramentas · memória</b>) e a interface do Claude (<b>memória · instruções · arquivos</b>): tudo aqui é <b>observável, editável e auditável</b> — o dev vê o que o agente "sabe", corrige o que estiver errado e expira o que não vale mais.</div>
+  </div>
+
+  <div class="grid cols-3" style="margin-bottom:18px">
+    <div class="card kpi"><div class="label">Memória de longo prazo</div><div class="val" id="ltmCount">${LTM.length}</div><div class="delta muted">fatos · Atlas + Vector Search</div></div>
+    <div class="card kpi"><div class="label">Memória de curto prazo</div><div class="val">${STM.length}</div><div class="delta muted">passos · checkpointer da sessão</div></div>
+    <div class="card kpi"><div class="label">Namespace ativo</div><div class="val" style="font-size:15px;line-height:1.5;margin-top:10px"><span class="mono">${MEM_NAMESPACE.org}</span><br><span class="mono muted">/${MEM_NAMESPACE.project}/${MEM_NAMESPACE.cluster}</span></div></div>
+  </div>
+
+  <div class="chat-wrap">
+    <div>
+      <div class="spread" style="align-items:center">
+        <div class="sectiontitle" style="margin:0">Memória de longo prazo <span class="muted small" style="font-weight:400">— editável</span></div>
+        <button class="btn sm" onclick="memAdd()">+ Adicionar fato</button>
+      </div>
+      <div class="flex small" style="gap:6px;margin:10px 0 14px;flex-wrap:wrap">
+        ${['all','org','project','cluster'].map(s=>`<span class="tag ${MEM_FILTER===s?'t-run':''}" style="cursor:pointer" onclick="memFilter('${s}')">${s==='all'?'todos os escopos':SCOPE_META[s].icon+' '+SCOPE_META[s].label}</span>`).join('')}
+      </div>
+      <div id="ltmList">${renderLTM()}</div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>Memória de curto prazo (sessão)</h3>
+        <div class="small muted" style="margin:6px 0 12px">Estado da investigação em andamento. Efêmero — vive no <span class="mono">checkpointer</span> (LangGraph + MongoDB) e expira ao fim da sessão.</div>
+        ${STM.map(s=>`<div style="padding:8px 0;border-bottom:1px solid #1b2335"><div class="small"><b style="color:var(--accent2)">${s.step}</b></div><div class="small muted" style="margin-top:3px">${s.note}</div></div>`).join('')}
+        <div class="small muted" style="margin-top:10px">Princípio de Context Engineering: <i>ao fim de cada passo, anexe o plano</i> — não reescreva o histórico.</div>
+      </div>
+
+      <div class="card mt" style="margin-top:16px">
+        <h3>Como funciona</h3>
+        <div style="margin-top:10px">
+          ${memHow('⬡','Escrita','Skills (ex. <span class="mono">memory-curator</span>) e o resultado de cada triagem gravam fatos relevantes — nunca segredos.')}
+          ${memHow('⌕','Recuperação','Antes de raciocinar, o agente busca a memória por <span class="mono">vector search</span> no namespace ativo (e herda do escopo pai).')}
+          ${memHow('✎','Edição humana','O dev edita/apaga/fixa fatos — igual à memória editável do Claude. Correções não são sobrescritas pelo agente.')}
+          ${memHow('◉','Auditoria','Toda escrita/edição vai pro SIEM com autor e timestamp.')}
+        </div>
+      </div>
+
+      <div class="card mt" style="margin-top:16px">
+        <h3>Namespaces hierárquicos</h3>
+        <div class="small muted" style="margin:6px 0 10px">Herança: <span class="mono">org → projeto → cluster</span>. Um fato no escopo da org vale para todos os clusters abaixo; o cluster pode ter fatos específicos.</div>
+        <div class="small" style="line-height:2">
+          <div><span class="tag" style="background:#251d0b;color:#f0b860">◈ org</span> contoso-atlas-prod</div>
+          <div style="padding-left:18px"><span class="tag" style="background:#0c1830;color:#56a8ff">▣ projeto</span> payments</div>
+          <div style="padding-left:36px"><span class="tag" style="background:#0c2220;color:#2dd4bf">⬡ cluster</span> fraud-ml-prod</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function memHow(ic,t,d){
+  return `<div class="flex" style="align-items:flex-start;gap:10px;padding:7px 0"><span style="color:var(--accent);font-size:16px;line-height:1.4">${ic}</span><div><div class="small"><b>${t}</b></div><div class="small muted">${d}</div></div></div>`;
+}
+function renderLTM(){
+  const items = LTM.filter(m=>MEM_FILTER==='all'||m.scope===MEM_FILTER);
+  if(!items.length) return `<div class="card"><div class="small muted">Nenhum fato neste escopo.</div></div>`;
+  return items.map(m=>{
+    const sc=SCOPE_META[m.scope];
+    return `<div class="card agent-card" id="mem_${m.id}" style="margin-bottom:12px;border-left:3px solid ${sc.color}">
+      <div class="spread" style="align-items:center">
+        <div class="flex" style="gap:8px;flex-wrap:wrap">
+          <span class="tag" style="background:${sc.color}22;color:${sc.color}">${sc.icon} ${sc.label}</span>
+          <span class="tag" style="background:#1b2335;color:#8b97b3">${m.kind}</span>
+          ${m.pinned?'<span class="tag" style="background:#251d0b;color:#f0b860">★ fixado</span>':''}
+        </div>
+        <span class="muted small">${m.ts}</span>
+      </div>
+      <div class="small" style="margin-top:10px;color:#c3cce0" id="memtxt_${m.id}">${m.text}</div>
+      <div class="small muted" style="margin-top:6px">origem: ${m.src}</div>
+      <div class="agent-actions flex mt2" style="gap:8px">
+        <button class="btn ghost sm" onclick="memEdit('${m.id}')">Editar</button>
+        <button class="btn ghost sm" onclick="memPin('${m.id}')">${m.pinned?'Desafixar':'Fixar'}</button>
+        <button class="btn ghost sm" style="color:#f87171" onclick="memForget('${m.id}')">Esquecer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function refreshLTM(){ const el=document.getElementById('ltmList'); if(el)el.innerHTML=renderLTM(); const c=document.getElementById('ltmCount'); if(c)c.textContent=LTM.length; }
+function memFilter(s){ MEM_FILTER=s; nav('memory'); }
+function memEdit(id){
+  const m=LTM.find(x=>x.id===id); if(!m)return;
+  const box=document.getElementById('memtxt_'+id);
+  box.innerHTML=`<textarea class="fi" style="width:100%;min-height:64px;resize:vertical" id="ed_${id}">${m.text}</textarea>
+    <div class="flex mt2" style="gap:8px"><button class="btn sm" onclick="memSave('${id}')">Salvar</button><button class="btn ghost sm" onclick="refreshLTM()">Cancelar</button></div>`;
+}
+function memSave(id){
+  const m=LTM.find(x=>x.id===id); const v=document.getElementById('ed_'+id).value.trim();
+  if(v){ m.text=v; m.src='dev (editado)'; m.ts='agora'; toast('Fato atualizado — auditado no SIEM'); }
+  refreshLTM();
+}
+function memPin(id){ const m=LTM.find(x=>x.id===id); m.pinned=!m.pinned; toast(m.pinned?'Fato fixado':'Fato desafixado'); refreshLTM(); }
+function memForget(id){
+  const el=document.getElementById('mem_'+id);
+  if(el){ el.style.opacity='.4'; }
+  LTM=LTM.filter(x=>x.id!==id);
+  toast('Fato esquecido — removido da memória de longo prazo');
+  setTimeout(refreshLTM,250);
+}
+function memAdd(){
+  const id='m'+Date.now();
+  LTM.unshift({id, scope:(MEM_FILTER==='all'?'cluster':MEM_FILTER), text:'(novo fato — clique em Editar para descrever)', kind:'fato', src:'dev (manual)', ts:'agora', pinned:false});
+  toast('Fato adicionado à memória de longo prazo');
+  refreshLTM();
+  setTimeout(()=>memEdit(id),100);
+}
+function afterMemory(){ /* placeholder p/ simetria com outras telas que usam after() */ }
+
+/* =====================================================================
+   7) FINOPS
+   ===================================================================== */
+function renderFinops(){
+  const total=MOCK.teamsSpend.reduce((a,t)=>a+t.usd,0);
+  const rows=MOCK.teamsSpend.sort((a,b)=>b.usd-a.usd).map(t=>`
+    <tr><td><b>${t.team}</b></td><td>${fmtUsd(t.usd)}</td><td>${fmtBrl(t.usd*PRICING.usdBrl)}</td>
+    <td style="width:160px"><div class="bar"><i style="width:${t.usd/total*100}%"></i></div></td>
+    <td>${(t.usd/total*100).toFixed(0)}%</td></tr>`).join('');
+  return `
+  <div class="grid cols-4">
+    <div class="card kpi"><div class="label">Spend mensal (fleet)</div><div class="val">${fmtUsd(total)}</div><div class="delta down">▲ 4% vs mês ant.</div></div>
+    <div class="card kpi"><div class="label">Projeção anual</div><div class="val">${fmtUsd(total*12)}</div><div class="delta muted">run-rate</div></div>
+    <div class="card kpi"><div class="label">Desperdício estimado</div><div class="val" style="color:#fbbf24">${fmtUsd(total*0.27)}</div><div class="delta muted">over-provisioning</div></div>
+    <div class="card kpi"><div class="label">Economia aplicada</div><div class="val" style="color:#34d399">${fmtUsd(4120)}</div><div class="delta up">▼ este trimestre</div></div>
+  </div>
+  <div class="grid cols-2 mt2" style="grid-template-columns:1.2fr 1fr;align-items:start">
+    <div class="card"><h3>Chargeback por time</h3><div class="desc">Allocação por tag de centro de custo</div>
+      <table class="mt"><thead><tr><th>Time</th><th>USD/mês</th><th>BRL/mês</th><th>Distribuição</th><th>%</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+    <div class="card"><h3>Spend por ambiente</h3><canvas id="finDonut" style="max-height:230px" class="mt"></canvas>
+      <div class="legend"><span><i style="background:#f87171"></i>prod 64%</span><span><i style="background:#fbbf24"></i>stage 18%</span><span><i style="background:#2dd4bf"></i>dev 12%</span><span><i style="background:#56a8ff"></i>test 6%</span></div>
+    </div>
+  </div>
+  <div class="card mt2"><h3>Recomendações de otimização</h3>
+    <table class="mt"><thead><tr><th>Recurso</th><th>Achado</th><th>Ação</th><th>Economia/mês</th></tr></thead><tbody>
+      <tr><td class="mono">catalog-search-stage</td><td>CPU média 12% nos últimos 30d</td><td>Downgrade M30 → M20</td><td style="color:#34d399">${fmtUsd(248)}</td></tr>
+      <tr><td class="mono">chat-rag-dev</td><td>Ocioso fora do horário comercial</td><td>Habilitar auto-pause</td><td style="color:#34d399">${fmtUsd(86)}</td></tr>
+      <tr><td class="mono">billing-core-prod</td><td>Storage 70% livre</td><td>Ajustar provisionamento</td><td style="color:#34d399">${fmtUsd(140)}</td></tr>
+    </tbody></table>
+  </div>`;
+}
+PAGES.finops.after=()=>{
+  const ctx=document.getElementById('finDonut'); if(!ctx)return;
+  charts.push(new Chart(ctx,{type:'doughnut',data:{labels:['prod','stage','dev','test'],datasets:[{data:[64,18,12,6],backgroundColor:['#f87171','#fbbf24','#2dd4bf','#56a8ff'],borderColor:'#0d1322',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}}));
+};
+
+/* =====================================================================
+   8) GUARDRAILS & SEGURANÇA
+   ===================================================================== */
+function connectorCard(title,names){
+  return `<div class="card"><div class="small muted" style="font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-size:10.5px">${title}</div>
+    <div style="margin-top:10px">${names.map(n=>{const off=n.includes('(off)');const label=n.replace(' (off)','');return `<div class="flex small" style="padding:4px 0"><span class="dot" style="background:${off?'#5b6480':'#34d399'}"></span> <span style="${off?'opacity:.6':''}">${label}</span></div>`;}).join('')}</div></div>`;
+}
+function renderGuardrails(){
+  const planes=[
+    {t:'Security & Identity Plane',c:'#6d6af5',items:['SSO federado: Microsoft Entra ID / AD · Okta · AWS IAM · Google Workspace','Grupos do IdP → roles do Atlas (RBAC)','Encryption at-rest com BYOK (KMS)','Database auth via SCRAM / X.509','Secrets em Vault / Key Vault']},
+    {t:'Networking',c:'#2dd4bf',items:['Peering multicloud: AWS · GCP · Azure','Private Endpoint / PrivateLink / PSC','IP Access List por ambiente','Sem exposição pública em prod','TLS 1.2+ obrigatório']},
+    {t:'Compliance & Audit',c:'#f0b860',items:['Audit log → SIEM (Splunk/Elastic)','Data residency por região','Retenção de logs 365d','Tags obrigatórias (centro de custo, owner)']},
+    {t:'Data Protection',c:'#34d399',items:['Backup contínuo (PITR) em prod','DR multi-region para FinServ','Online Archive p/ data tiering','Política de retenção por classificação']},
+  ];
+  const cards=planes.map(p=>`<div class="card"><h3 style="color:${p.c}">${p.t}</h3><ul class="small" style="padding-left:16px;line-height:2;color:#c3cce0;margin:10px 0 0">${p.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`).join('');
+  return `
+  <div class="banner" style="margin-bottom:8px"><div>Toda solicitação herda estas políticas <b>automaticamente</b> a partir do template — o dev não consegue criar nada fora do padrão. É o "guardrail" da landing zone.</div></div>
+  <div class="sectiontitle">Conectores plugáveis — adaptam o Maestro ao ambiente do cliente</div>
+  <div class="grid cols-4">
+    ${connectorCard('Autenticação', AUTH_SOURCES.map(a=>a.name+(a.on?'':' (off)')))}
+    ${connectorCard('Observabilidade', OBS_SOURCES.map(o=>o.name+(o.on?'':' (off)')))}
+    ${connectorCard('Base de conhecimento', KB_SOURCES.map(k=>k.name))}
+    ${connectorCard('Cloud / Peering', CLOUD_SOURCES.map(c=>c.name+(c.on?'':' (off)')))}
+  </div>
+  <div class="small muted" style="margin:10px 2px 0">Cada camada é uma interface plugável: o core do Maestro não muda — só se conecta ao que o cliente já roda em produção. FinOps usa as <span class="mono">Atlas Billing APIs</span> (ver tela FinOps).</div>
+  <div class="sectiontitle">Mapa de classificação → template</div>
+  <div class="card" style="padding:6px 6px 0">
+    <table><thead><tr><th>Classificação do dado</th><th>Templates permitidos</th><th>BYOK</th><th>Backup</th><th>Rede</th></tr></thead><tbody>
+      <tr><td><span class="tag t-dev">Interno</span></td><td>Web Standard, Sandbox</td><td>Opcional</td><td>Snapshot 7d</td><td>IP Access List</td></tr>
+      <tr><td><span class="tag t-stage">Confidencial</span></td><td>OLTP Prod, Analytics, GenAI</td><td>Recomendado</td><td>PITR 7d</td><td>Private Endpoint</td></tr>
+      <tr><td><span class="tag t-prod">Restrito (PII/PCI)</span></td><td>FinServ Regulado</td><td><b>Obrigatório</b></td><td>PITR + DR</td><td>Private Link + data residency</td></tr>
+    </tbody></table>
+  </div>
+  <div class="sectiontitle">Planos de controle codificados</div>
+  <div class="grid cols-2">${cards}</div>`;
+}
+
+/* =====================================================================
+   9) BASE DE CONHECIMENTO (Confluence mock)
+   ===================================================================== */
+const KB=[
+  {bc:'Positioning',t:'Decision Tree: quando usar Atlas',d:'Árvore de decisão para escolher MongoDB Atlas vs alternativas.',body:`<h4>Quando o Atlas é a melhor escolha</h4><ul><li>Modelo de dados flexível / documentos, dados semiestruturados.</li><li>Necessidade de escala horizontal (sharding) e multi-region.</li><li>Busca vetorial / GenAI (Atlas Vector Search).</li><li>Time quer foco em produto, não em operar banco.</li></ul><p>Para cargas puramente relacionais com forte normalização e JOINs intensivos, avalie em conjunto com o time de arquitetura.</p>`},
+  {bc:'Sizing & Cost',t:'Questionário de Sizing',d:'Perguntas para dimensionar corretamente o cluster.',body:`<h4>Colete antes de dimensionar</h4><ul><li>Volume total de dados hoje e crescimento em 12 meses.</li><li>Working set (dado quente acessado com frequência).</li><li>Throughput: leituras e escritas por segundo (médio e pico).</li><li>Pico de conexões simultâneas.</li><li>Requisitos de HA/DR e região.</li></ul><p>Use o <b>Maestro Copilot</b> para transformar essas respostas em um tier recomendado e custo estimado.</p>`},
+  {bc:'Sizing & Cost',t:'Tabela de tiers e preços',d:'Referência rápida de RAM, vCPU, storage e custo.',body:`<table><thead><tr><th>Tier</th><th>RAM</th><th>vCPU</th><th>Storage</th><th>~USD/mês*</th></tr></thead><tbody>${TIERS.map(t=>`<tr><td class="mono">${t.name}</td><td>${t.ram}GB</td><td>${t.vcpu}</td><td>${t.storage}GB</td><td>${fmtUsd(estimateCost({tier:t.name,region:'us-east-1',storageGB:0,nodes:1}).total)}</td></tr>`).join('')}</tbody></table><p class="small muted">*Estimativa us-east-1, incluindo backup e +10% rede. Custos reais variam por cloud/região.</p>`},
+  {bc:'Set-up',t:'Provisionamento via Terraform',d:'Como a esteira IaC cria o cluster.',body:`<h4>Fluxo</h4><p>O dev submete o formulário → a request vira variáveis Terraform → a pipeline (Azure DevOps) roda <code>plan</code> e, após aprovação de budget, <code>apply</code>. O provider oficial <code>mongodbatlas</code> chama o Atlas Admin API.</p><p>Recursos criados: cluster, IP access list, backup schedule, private endpoint, chave de encryption e datasource de observabilidade.</p>`},
+  {bc:'FinOps',t:'Cross-Org Billing & Chargeback',d:'Como alocar custo por time/BU.',body:`<h4>Boas práticas</h4><ul><li>Tag obrigatória de centro de custo em todo cluster.</li><li>Billing API do Atlas integrada à ferramenta de FinOps.</li><li>Relatórios de chargeback por time e ambiente.</li><li>Alertas de budget por projeto.</li></ul>`},
+  {bc:'FAQ',t:'Perguntas frequentes',d:'Dúvidas comuns dos times de aplicação.',body:`<h4>Quanto tempo leva para ter um cluster?</h4><p>Minutos após a aprovação — contra semanas no processo manual.</p><h4>Posso mudar o tier depois?</h4><p>Sim, com scaling sem downtime. O Copilot ajuda a reavaliar.</p><h4>E se passar do budget?</h4><p>A request vai para aprovação financeira automaticamente, com sugestão de otimização.</p>`},
+];
+function renderKB(){
+  const cards=KB.map((k,i)=>`<div class="kb-card" onclick="openKB(${i})"><div class="breadcrumb">${k.bc}</div><div class="kt">${k.t}</div><div class="kd">${k.d}</div></div>`).join('');
+  const sources=KB_SOURCES.map(s=>`<span class="tag ${s.on?'t-ok':''}" style="${s.on?'':'opacity:.6'}"><span class="dot" style="background:${s.on?'#34d399':'#5b6480'}"></span> ${s.name}</span>`).join(' ');
+  return `<div class="banner" style="margin-bottom:8px"><div>Base de conhecimento federada — conectores plugáveis indexados por <b>Atlas Vector Search</b> e servidos ao agente como memória de longo prazo. Fontes ativas: ${sources}</div></div>
+  <div class="small muted" style="margin:4px 2px 14px">Conecte a fonte que o cliente já usa. O Maestro normaliza o conteúdo, gera embeddings (Voyage AI) e indexa no Atlas — o agente recupera via RAG.</div>
+  <div class="kb-grid mt2">${cards}</div>`;
+}
+function openKB(i){const k=KB[i];openModal(`<div class="modal-h"><div class="ic-box" style="background:var(--accent-soft)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h9l5 5v11H5z" stroke="#6d6af5" stroke-width="1.6" stroke-linejoin="round"/></svg></div><div><div class="breadcrumb">${k.bc}</div><b>${k.t}</b></div><span class="x" onclick="closeModal()">×</span></div><div class="modal-b">${k.body}</div>`);}
+</script>
+</body>
+</html>
