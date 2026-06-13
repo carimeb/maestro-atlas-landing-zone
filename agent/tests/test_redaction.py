@@ -3,7 +3,7 @@ from maestro_agent.security.redaction import scan, ensure_clean, SecretDetected
 
 
 def test_connection_string_com_senha_detectada():
-    findings = scan("uri do cluster: mongodb+srv://admin:Hunter2@cluster0.mongodb.net")
+    findings = scan("uri do cluster: mongodb+srv://<user>:<passkey>@cluster0.mongodb.net")
     assert any(f.rule == "connection_string_com_credencial" for f in findings)
 
 
