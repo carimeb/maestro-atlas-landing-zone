@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maestro-agent"
+version = "0.1.0"
+description = "Camada de agentes do Maestro: memoria, provedores plugaveis, seguranca e auditoria"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+
+# Decisao deliberada: o nucleo NAO tem dependencia obrigatoria.
+# Tudo que toca rede ou servico externo e opcional (extras abaixo).
+# Isso reduz superficie de ataque e simplifica aprovacao em ambientes
+# Enterprise com politica de dependencias.
+dependencies = []
+
+[project.optional-dependencies]
+atlas = ["pymongo>=4.7,<5"]
+voyage = ["voyageai>=0.2,<1"]
+openai = ["openai>=1.30,<2"]
+graph = ["langgraph>=0.2,<2", "langgraph-checkpoint-mongodb>=0.1,<1"]
+anthropic = ["anthropic>=0.40,<1"]
+dev = ["pytest>=8,<9"]
+all = ["maestro-agent[atlas,voyage,openai,graph,anthropic]"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
