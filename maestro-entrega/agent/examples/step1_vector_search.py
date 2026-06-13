@@ -65,7 +65,7 @@ def main():
     try:
         store.ingest([MemoryFact(
             "cluster", "fato",
-            "Anotar acesso: mongodb+srv://admin:Sup3rS3creta@cluster0.mongodb.net",
+            "Anotar acesso: mongodb+srv://<user>:<passkey>@cluster0.mongodb.net",
             "dev (manual)", NAMESPACE,
         )])
     except SecretDetected as exc:
